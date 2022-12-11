@@ -2,6 +2,11 @@ const axios = require("axios");
 const { JSDOM } = require("jsdom");
 const { XMLParser } = require("fast-xml-parser");
 var qs = require('qs');
+const moment = require("moment/moment");
+
+
+
+
 async function One() {
   var config = {
     method: "get",
@@ -310,6 +315,9 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
     });
 }
 async function clickOK(jsession, uri, button, dom, viewstate) {
+  var date = moment().format("mmm/dd/yyyy")
+var date2 = moment().format("yyyy-MM-dd")
+
   const doc_arr = dom.window.document.getElementsByTagName('input')
 
   const doc = Array.from(doc_arr).map((x) => {
@@ -328,16 +336,15 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
     [`${doc[0].split(":")[0]}`]: 'true',
     [`${doc[0].slice(0, -4)}`]: '',
     [`${doc[0].slice(0, -4)}:value`]: '',
-    [`${doc[2].slice(0, -2)}`]: 'Nov/20/2022',
+    [`${doc[2].slice(0, -2)}`]: date,
     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 2}:_fc_`]: '',
-    [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 2}`]: '2022-11-20',
+    [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 2}`]: date2,
     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 1}:hasContent`]: 'true',
-    [`${doc[4].slice(0, -2)}`]: 'Nov/20/2022',
+    [`${doc[4].slice(0, -2)}`]: date,
     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 4}:_fc_`]: '',
-    [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 4}`]: '2022-11-20',
+    [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 4}`]: date2,
     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 3}:hasContent`]: 'true',
     [`${doc[0].split(":")[0]}:${weblist}:hasContent`]: 'true',
-    //[`${doc[6].slice(0, -11)}:popupState`]: '',
     [`${doc[6].slice(0, -11)}:windowState`]: 'window:normal;',
     [`${doc[6].slice(0, -11)}:hasContent`]: 'true',
     [`${doc[6].slice(0, -11)}:windowSize`]: '420@209',
@@ -422,7 +429,7 @@ async function main() {
     }
   })
   console.timeEnd()
-  console.log("finish")
+  return samples_ext
 
 }
 main();
