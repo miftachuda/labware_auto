@@ -52,7 +52,7 @@ async function LoginForm(jsession) {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'content-length': 427,
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'http://ptmkplims02.pertamina.com:8080',
@@ -88,7 +88,7 @@ async function mainPage(jsession) {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'referer': 'http://ptmkplims02.pertamina.com:8080/WebLIMS/login.htm',
       'connection': 'keep-alive',
       'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
@@ -136,7 +136,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': '*/*',
       'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'content-length': 289,
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'http://ptmkplims02.pertamina.com:8080',
@@ -170,7 +170,7 @@ async function openTable(jsession, uri) {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
       accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       referer: 'http://ptmkplims02.pertamina.com:8080/WebLIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'accept-language': 'en-US,en;q=0.9',
       cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt`
     }
@@ -289,7 +289,7 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': '*/*',
       'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'http://ptmkplims02.pertamina.com:8080',
       'connection': 'keep-alive',
@@ -316,7 +316,7 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
 }
 async function clickOK(jsession, uri, button, dom, viewstate) {
   var date = moment().format("mmm/dd/yyyy")
-var date2 = moment().format("yyyy-MM-dd")
+  var date2 = moment().format("yyyy-MM-dd")
 
   const doc_arr = dom.window.document.getElementsByTagName('input')
 
@@ -364,7 +364,7 @@ var date2 = moment().format("yyyy-MM-dd")
       'accept': '*/*',
       'origin': 'http://ptmkplims02.pertamina.com:8080',
       'referer': `http://ptmkplims02.pertamina.com:8080/WebLIMS/${uri}`,
-      'accept-encoding': 'gzip, deflate',
+      'accept-encoding': '*',
       'accept-language': 'en-US,en;q=0.9',
       'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus}; ec_focus=${ecfocus}`
     },
