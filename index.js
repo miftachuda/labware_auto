@@ -638,6 +638,7 @@ function stringRep(text) {
     "Flash Point COC": "FP COC",
     "Flash Point PMCC": "FP PMCC",
     "Refractive Index 70°C": "RI 70°C",
+    "Refractive Index 20°C": "RI 20°C",
     "Appearance": "App",
     "Specific Gravity at 70°C": "Sg 70°C",
     "Colour ASTM": "Color",
