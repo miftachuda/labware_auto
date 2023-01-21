@@ -559,13 +559,17 @@ async function sortSample(raw_sam) {
 
 }
 function detectShift(sample_obj) {
-  var date = new Date(Date.parse(sample_obj.date))
-  if (date.getHours() < 8) {
-    return "malam"
-  } else if (date.getHours() >= 8 && date.getHours() < 16) {
-    return "pagi"
+  if (sample_obj.length > 0) {
+    var date = new Date(Date.parse(sample_obj[0].date))
+    if (date.getHours() < 8) {
+      return "Malam"
+    } else if (date.getHours() >= 8 && date.getHours() < 16) {
+      return "Pagi"
+    } else {
+      return "Sore"
+    }
   } else {
-    return "sore"
+    return "No Sample"
   }
 }
 
@@ -584,15 +588,15 @@ async function castSample(sam) {
     function (acc, curr) {
       let sample_name = curr[0].code
       let point_detail = curr.reduce(function (acc, curr1) {
-        str = `${curr1.param}: ${curr1.value} ${curr1.unit} \n`
+        str = `${curr1.param} : ${curr1.value} ${curr1.unit} \n`
         acc = `${acc} ${str}`
         return acc;
       }, "")
-      acc = `${acc}\n${sample_name}:\n${point_detail}`
+      acc = `${acc}<b>${sample_name} :</b>\n${point_detail}`
 
       return acc;
     }, "")
-  return `<b>Shift : ${shift}</b> \n ${final_sample}`
+  return `<b>Shift : ${shift}</b> \n${final_sample}`
 }
 async function sendMessage(message) {
   console.log(message)
@@ -625,7 +629,38 @@ async function sendMessage(message) {
       console.log("Failed sending Telegram message");
     });
 }
+function stringRep(text) {
 
+  var mapObj = {
+    "Kinematic Viscosity at 40°C": "Visco 40°C",
+    "Kinematic Viscosity at 60°C": "Visco 60°C",
+    "Kinematic Viscosity at 100°C": "Visco 100°C",
+    "Flash Point COC": "FP COC",
+    "Flash Point PMCC": "FP PMCC",
+    "Refractive Index 70°C": "RI 70°C",
+    "Appearance": "App",
+    "Specific Gravity at 70°C": "Sg 70°C",
+    "Colour ASTM": "Color",
+    "Conradson Carbon Residue": "CCR",
+    "Specific Gravity at 60/60°F": "Sg 60/60°F",
+    "Viscosity Gravity Constant": "VGC",
+    "Pour Point": "PP",
+    "Viscosity Index": "VI",
+    "Traces Methyl Ethyl Ketone": "Traces MEK",
+    "MM2_S": "cSt",
+    "NONE": "",
+    "DEG_C": "°C",
+    "ASTM_UNIT": "",
+    "DEG_F": "°F",
+    "PCT_MM": "",
+  };
+
+  var re = new RegExp(Object.keys(mapObj).join("|"), "gi");
+  str = text.replace(re, function (matched) {
+    return mapObj[matched];
+  });
+  return str
+}
 async function main() {
   console.time()
   const jsession1 = await One();
@@ -669,7 +704,8 @@ async function main() {
   for (const val of Object.values(sorted)) {
     if (val.length > 0) {
       const casted = await castSample(val)
-      await sendMessage(casted)
+      const reduced = stringRep(casted)
+      await sendMessage(reduced)
       console.log(casted)
     }
   }
