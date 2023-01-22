@@ -13,7 +13,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: budle
-        run: npx esbuild index.js --bundle --outfile=/dist/index.js
+        run: npx esbuild index.js --bundle --platform=node --outfile=/dist/index.js
       - uses: actions/upload-artifact@v2
         with:
           name: distributables
