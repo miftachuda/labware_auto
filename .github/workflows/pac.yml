@@ -1,4 +1,4 @@
-name: make sing exe
+name: build exe
 on:
   workflow_dispatch:
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - name: budle
         run: npx esbuild index.js --bundle --platform=node --external:canvas --outfile=dist/index.js
       - name: pkg
-        run: npx pkg --compress GZip node14-win dist/index.js
+        run: npx pkg --compress GZip -t node14-win dist/index.js
       - uses: actions/upload-artifact@v2
         with:
           name: distributables
