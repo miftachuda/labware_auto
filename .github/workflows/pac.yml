@@ -21,3 +21,8 @@ jobs:
           name: distributables
           path: dist/*
           if-no-files-found: error
+      - uses: actions/upload-artifact@v2
+        with:
+          name: executeable
+          path: /*.exe
+          if-no-files-found: error
