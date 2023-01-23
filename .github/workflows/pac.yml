@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   pack:
-    name: deploy to staging
+    name: bundling & packing
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -12,9 +12,9 @@ jobs:
           node-version: 16.18.0
       - name: Install Dependencies
         run: npm install
-      - name: budle
+      - name: Bundling with esbuild
         run: npx esbuild index.js --bundle --platform=node --external:canvas --outfile=dist/index.js
-      - name: pkg
+      - name: Packaging with pkg
         run: npx pkg --compress GZip -t node14-win dist/index.js
       - uses: actions/upload-artifact@v2
         with:
