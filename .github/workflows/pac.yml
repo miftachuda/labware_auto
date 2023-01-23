@@ -36,7 +36,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: executeable
-          path: '**/*.exe'
+          path: exe
 
       - name: Upload server release
         uses: svenstaro/upload-release-action@v2
