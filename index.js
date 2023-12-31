@@ -10,7 +10,7 @@ const moment = require("moment/moment");
 async function One() {
   var config = {
     method: "get",
-    url: "https://apps.pertamina.com/WebLIMS/login.htm",
+    url: "https://apps.pertamina.com/LIMS/login.htm",
     headers: {
       host: "apps.pertamina.com",
       "user-agent":
@@ -46,7 +46,7 @@ async function LoginForm(jsession) {
   });
   var config = {
     method: 'post',
-    url: 'https://apps.pertamina.com/WebLIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+    url: 'https://apps.pertamina.com/LIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton',
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
@@ -57,7 +57,7 @@ async function LoginForm(jsession) {
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
-      'referer': 'https://apps.pertamina.com/WebLIMS/login.htm',
+      'referer': 'https://apps.pertamina.com/LIMS/login.htm',
       'cookie': `${jsession}  ec_aurl=L1dlYkxJTVMvbG9naW4uaHRt;`,
       'upgrade-insecure-requests': '1'
     },
@@ -82,14 +82,14 @@ async function mainPage(jsession) {
 
   var config = {
     method: 'get',
-    url: 'https://apps.pertamina.com/WebLIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+    url: 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.5',
       'accept-encoding': '*',
-      'referer': 'https://apps.pertamina.com/WebLIMS/login.htm',
+      'referer': 'https://apps.pertamina.com/LIMS/login.htm',
       'connection': 'keep-alive',
       'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
       'upgrade-insecure-requests': '1'
@@ -131,7 +131,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
   });
   var config = {
     method: 'post',
-    url: `https://apps.pertamina.com/WebLIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`,
+    url: `https://apps.pertamina.com/LIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
@@ -142,7 +142,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
-      'referer': 'https://apps.pertamina.com/WebLIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+      'referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
       'cookie': `${jsession} _ga=GA1.2.1113838315.1658209289; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`
     },
     data: data,
@@ -163,14 +163,14 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
 async function openTable(jsession, uri) {
   var options = {
     method: 'GET',
-    url: `https://apps.pertamina.com/WebLIMS/${uri}`,
+    url: `https://apps.pertamina.com/LIMS/${uri}`,
     headers: {
       host: 'apps.pertamina.com',
       'proxy-connection': 'keep-alive',
       'upgrade-insecure-requests': '1',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
       accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-      referer: 'https://apps.pertamina.com/WebLIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+      referer: 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
       'accept-encoding': '*',
       'accept-language': 'en-US,en;q=0.9',
       cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt`
@@ -299,7 +299,7 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
   });
   var config = {
     method: 'post',
-    url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`,
+    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
@@ -309,7 +309,7 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
-      'referer': `https://apps.pertamina.com/WebLIMS/${uri}`,
+      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
       'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
     },
     data: data
@@ -375,7 +375,7 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
   const but_arr = button.split(":")
   var config = {
     method: 'post',
-    url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`,
+    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
@@ -383,7 +383,7 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
       'accept': '*/*',
 
       'origin': 'https://apps.pertamina.com',
-      'referer': `https://apps.pertamina.com/WebLIMS/${uri}`,
+      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
       'accept-encoding': '*',
       'accept-language': 'en-US,en;q=0.9',
       'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; lw_focus_=${lwfocus}; ec_focus=${ecfocus}`
@@ -409,7 +409,7 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
 async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
   var options = {
     method: 'POST',
-    url: `https://apps.pertamina.com/WebLIMS/${uri}`,
+    url: `https://apps.pertamina.com/LIMS/${uri}`,
     params: {
       ec_eid: 'onhide',
       ec_cid: onHidelink,
@@ -423,7 +423,7 @@ async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
       'content-type': 'application/x-www-form-urlencoded',
       accept: '*/*',
       origin: 'https://apps.pertamina.com',
-      referer: `https://apps.pertamina.com/WebLIMS/${uri}`,
+      referer: `https://apps.pertamina.com/LIMS/${uri}`,
       'accept-encoding': 'gzip, deflate',
       'accept-language': 'en-US,en;q=0.9',
       cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus} ec_focus=${ecfocus}`
@@ -516,7 +516,7 @@ async function refreshTable(jsession, uri, switch_button, table_id, popup, viewg
   });
   const config = {
     method: 'post',
-    url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`,
+    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
       'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
@@ -526,7 +526,7 @@ async function refreshTable(jsession, uri, switch_button, table_id, popup, viewg
       'content-type': 'application/x-www-form-urlencoded',
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
-      'referer': `https://apps.pertamina.com/WebLIMS/${uri}`,
+      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
       'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
     },
     data: data
