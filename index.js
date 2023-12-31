@@ -12,7 +12,7 @@ async function One() {
     method: "get",
     url: "https://apps.pertamina.com/WebLIMS/login.htm",
     headers: {
-      host: "ptmkplims02.pertamina.com:8080",
+      host: "apps.pertamina.com",
       "user-agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
       accept:
@@ -48,7 +48,7 @@ async function LoginForm(jsession) {
     method: 'post',
     url: 'https://apps.pertamina.com/WebLIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton',
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.5',
@@ -84,7 +84,7 @@ async function mainPage(jsession) {
     method: 'get',
     url: 'https://apps.pertamina.com/WebLIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.5',
@@ -133,7 +133,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
     method: 'post',
     url: `https://apps.pertamina.com/WebLIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': '*/*',
       'accept-language': 'en-US,en;q=0.5',
@@ -165,7 +165,7 @@ async function openTable(jsession, uri) {
     method: 'GET',
     url: `https://apps.pertamina.com/WebLIMS/${uri}`,
     headers: {
-      host: 'ptmkplims02.pertamina.com:8080',
+      host: 'apps.pertamina.com',
       'proxy-connection': 'keep-alive',
       'upgrade-insecure-requests': '1',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
@@ -301,7 +301,7 @@ async function openDate(jsession, uri, run_button, table_id, popup, viewguid, vi
     method: 'post',
     url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': '*/*',
       'accept-language': 'en-US,en;q=0.5',
@@ -377,7 +377,7 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
     method: 'post',
     url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
       'content-type': 'application/x-www-form-urlencoded',
       'accept': '*/*',
@@ -417,7 +417,7 @@ async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
       ts: Date.now()
     },
     headers: {
-      host: 'ptmkplims02.pertamina.com:8080',
+      host: 'apps.pertamina.com',
       'proxy-connection': 'keep-alive',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
       'content-type': 'application/x-www-form-urlencoded',
@@ -518,7 +518,7 @@ async function refreshTable(jsession, uri, switch_button, table_id, popup, viewg
     method: 'post',
     url: `https://apps.pertamina.com/WebLIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`,
     headers: {
-      'host': 'ptmkplims02.pertamina.com:8080',
+      'host': 'apps.pertamina.com',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
       'accept': '*/*',
       'accept-language': 'en-US,en;q=0.5',
