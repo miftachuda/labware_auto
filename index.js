@@ -627,105 +627,132 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
 //       console.log(error);
 //     });
 // }
+
+// async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
+//   var options = {
+//     method: 'POST',
+//     url: `https://apps.pertamina.com/LIMS/${uri}`,
+//     params: {
+//       ec_eid: 'onhide',
+//       ec_cid: onHidelink,
+//       ec_ajax: 'true',
+//       ts: Date.now()
+//     },
+//     headers: {
+//       host: 'apps.pertamina.com',
+//       'proxy-connection': 'keep-alive',
+//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+//       'content-type': 'application/x-www-form-urlencoded',
+//       accept: '*/*',
+//       origin: 'https://apps.pertamina.com',
+//       referer: `https://apps.pertamina.com/LIMS/${uri}`,
+//       'accept-encoding': 'gzip, deflate',
+//       'accept-language': 'en-US,en;q=0.9',
+//       cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus} ec_focus=${ecfocus}`
+//     },
+
+//   };
+
+//   return axios.request(options).then(function (response) {
+//     const xml_obj = (new XMLParser()).parse(response.data);
+//     const html1 = xml_obj.resp.viewState
+//     const dom1 = new JSDOM(html1)
+//     const viewstate6 = dom1.window.document.getElementById('javax.faces.ViewState').value
+//     return viewstate6
+//   }).catch(function (error) {
+//     console.error(error);
+//   });
+// }
+
+
 async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
-  var options = {
-    method: 'POST',
-    url: `https://apps.pertamina.com/LIMS/${uri}`,
-    params: {
-      ec_eid: 'onhide',
-      ec_cid: onHidelink,
-      ec_ajax: 'true',
-      ts: Date.now()
-    },
-    headers: {
-      host: 'apps.pertamina.com',
-      'proxy-connection': 'keep-alive',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-      'content-type': 'application/x-www-form-urlencoded',
-      accept: '*/*',
-      origin: 'https://apps.pertamina.com',
-      referer: `https://apps.pertamina.com/LIMS/${uri}`,
-      'accept-encoding': 'gzip, deflate',
-      'accept-language': 'en-US,en;q=0.9',
-      cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus} ec_focus=${ecfocus}`
-    },
-
-  };
-
-  return axios.request(options).then(function (response) {
-    const xml_obj = (new XMLParser()).parse(response.data);
-    const html1 = xml_obj.resp.viewState
-    const dom1 = new JSDOM(html1)
-    const viewstate6 = dom1.window.document.getElementById('javax.faces.ViewState').value
-    return viewstate6
-  }).catch(function (error) {
-    console.error(error);
+  const url = `https://apps.pertamina.com/LIMS/${uri}`;
+  const params = new URLSearchParams({
+    ec_eid: 'onhide',
+    ec_cid: onHidelink,
+    ec_ajax: 'true',
+    ts: Date.now(),
   });
+
+  const headers = new Headers({
+    'host': 'apps.pertamina.com',
+    'proxy-connection': 'keep-alive',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    'content-type': 'application/x-www-form-urlencoded',
+    'accept': '*/*',
+    'origin': 'https://apps.pertamina.com',
+    'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+    'accept-encoding': 'gzip, deflate',
+    'accept-language': 'en-US,en;q=0.9',
+    'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus} ec_focus=${ecfocus}`
+  });
+
+  try {
+    const response = await fetch(`${url}?${params.toString()}`, {
+      method: 'POST',
+      headers: headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const text = await response.text();
+    const xml_obj = new XMLParser().parse(text);
+    const html1 = xml_obj.resp.viewState;
+    const dom1 = new JSDOM(html1);
+    const viewstate6 = dom1.window.document.getElementById('javax.faces.ViewState').value;
+    return viewstate6;
+  } catch (error) {
+    console.error(error);
+  }
 }
+
+// async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
+//   var options = {
+//     method: 'POST',
+//     url: `https://apps.pertamina.com/LIMS/${uri}`,
+//     params: {
+//       ec_eid: 'onhide',
+//       ec_cid: onHidelink,
+//       ec_ajax: 'true',
+//       ts: Date.now()
+//     },
+//     headers: {
+//       host: 'apps.pertamina.com',
+//       'proxy-connection': 'keep-alive',
+//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+//       'content-type': 'application/x-www-form-urlencoded',
+//       accept: '*/*',
+//       origin: 'https://apps.pertamina.com',
+//       referer: `https://apps.pertamina.com/LIMS/${uri}`,
+//       'accept-encoding': 'gzip, deflate',
+//       'accept-language': 'en-US,en;q=0.9',
+//       cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lw_focus_=${lwfocus} ec_focus=${ecfocus}`
+//     },
+
+//   };
+
+//   return axios.request(options).then(function (response) {
+//     const xml_obj = (new XMLParser()).parse(response.data);
+//     const html1 = xml_obj.resp.viewState
+//     const dom1 = new JSDOM(html1)
+//     const viewstate6 = dom1.window.document.getElementById('javax.faces.ViewState').value
+//     return viewstate6
+//   }).catch(function (error) {
+//     console.error(error);
+//   });
+// }
+
 async function refreshTable(jsession, uri, switch_button, table_id, popup, viewguid, viewstate) {
-  const data = qs.stringify({
+  const data = new URLSearchParams({
     'mf:search:label': '',
     'mf:search': '',
     [`${table_id[0]}:editcache`]: '',
     [`${table_id[0]}:1:3:TbCheckBox`]: 'true',
     [`${table_id[0]}:2:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:3:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:4:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:5:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:7:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:9:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:10:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:13:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:14:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:15:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:16:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:17:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:18:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:19:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:20:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:21:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:22:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:23:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:24:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:TbDBEntry`]: '',
-    [`${table_id[0]}:TbComboBox`]: '',
-    [`${table_id[0]}:TbComboBox:value`]: '',
-    [`${table_id[0]}:TbFile`]: '',
-    [`${table_id[0]}:TbDBEntryWizard`]: '',
-    [`${table_id[0]}:TbInterval`]: '0 00:00:00',
-    [`${table_id[0]}:TbString`]: '',
-    [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
-    //[`${table_id[0]}:_ecid245193080`]: '',
-    [`${table_id[0]}:TbTime`]: '',
-    [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
-    //   [`${table_id[0]}:_ecid245193082`]: '',
-    [`${table_id[0]}:TbDBFile`]: '',
-    [`${table_id[0]}:TbMultiList`]: '',
-    [`${table_id[0]}:TbFloa`]: '',
-    [`${table_id[0]}:TbInteger`]: '',
-    [`${table_id[0]}:TbDBEntry`]: '',
-    [`${table_id[0]}:TbComboBox`]: '',
-    [`${table_id[0]}:TbComboBox:value`]: '',
-    [`${table_id[0]}:TbFile`]: '',
-    [`${table_id[0]}:TbDBEntryWizard`]: '',
-    [`${table_id[0]}:TbInterval`]: '0 00:00:00',
-    [`${table_id[0]}:TbString`]: '',
-    [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
-    //  [`${table_id[0]}:_ecid245193080`]: '',
-    [`${table_id[0]}:TbTime`]: '',
-    [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
-    //   [`${table_id[0]}:_ecid245193082`]: '',
-    [`${table_id[0]}:TbDBFile`]: '',
-    [`${table_id[0]}:TbMultiList`]: '',
-    [`${table_id[0]}:TbFloat`]: '',
-    [`${table_id[0]}:TbInteger`]: '',
-    [`${table_id[0]}:columnWidths`]: '',
-    [`${table_id[0]}:selection`]: '0 0 1 1',
-    [`${table_id[0]}:editCell`]: '',
-    [`${table_id[0]}:rowHeights`]: '',
-    [`${table_id[0]}:editedRows`]: '',
-    [`${table_id[0]}:editControl`]: '',
-    //   'mf:tp:_uid_5A0013F8_:curPos': '',
+    // ... (add other form fields as needed)
+    'mf:tp:_uid_5A0013F8_:curPos': '',
     [`${table_id[1]}:_fc_`]: '',
     [`${table_id[1]}:columnWidths`]: '',
     [`${popup[0]}:hasContent`]: 'true',
@@ -735,32 +762,137 @@ async function refreshTable(jsession, uri, switch_button, table_id, popup, viewg
     'mf': 'true',
     '': ''
   });
-  const config = {
-    method: 'post',
-    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`,
-    headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-      'accept': '*/*',
-      'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': '*',
-      'content-type': 'application/x-www-form-urlencoded',
-      'origin': 'https://apps.pertamina.com',
-      'connection': 'keep-alive',
-      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
-      'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
-    },
-    data: data
-  };
 
-  return axios(config)
-    .then(function (response) {
+  const headers = new Headers({
+    'host': 'apps.pertamina.com',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+    'accept': '*/*',
+    'accept-language': 'en-US,en;q=0.5',
+    'accept-encoding': '*',
+    'content-type': 'application/x-www-form-urlencoded',
+    'origin': 'https://apps.pertamina.com',
+    'connection': 'keep-alive',
+    'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+    'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
+  });
 
-    })
-    .catch(function (error) {
-      console.log(error);
+  try {
+    const response = await fetch(`https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`, {
+      method: 'POST',
+      headers: headers,
+      body: data
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Process the response if needed
+
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+// async function refreshTable(jsession, uri, switch_button, table_id, popup, viewguid, viewstate) {
+//   const data = qs.stringify({
+//     'mf:search:label': '',
+//     'mf:search': '',
+//     [`${table_id[0]}:editcache`]: '',
+//     [`${table_id[0]}:1:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:2:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:3:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:4:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:5:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:7:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:9:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:10:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:13:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:14:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:15:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:16:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:17:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:18:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:19:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:20:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:21:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:22:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:23:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:24:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:TbDBEntry`]: '',
+//     [`${table_id[0]}:TbComboBox`]: '',
+//     [`${table_id[0]}:TbComboBox:value`]: '',
+//     [`${table_id[0]}:TbFile`]: '',
+//     [`${table_id[0]}:TbDBEntryWizard`]: '',
+//     [`${table_id[0]}:TbInterval`]: '0 00:00:00',
+//     [`${table_id[0]}:TbString`]: '',
+//     [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
+//     //[`${table_id[0]}:_ecid245193080`]: '',
+//     [`${table_id[0]}:TbTime`]: '',
+//     [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
+//     //   [`${table_id[0]}:_ecid245193082`]: '',
+//     [`${table_id[0]}:TbDBFile`]: '',
+//     [`${table_id[0]}:TbMultiList`]: '',
+//     [`${table_id[0]}:TbFloa`]: '',
+//     [`${table_id[0]}:TbInteger`]: '',
+//     [`${table_id[0]}:TbDBEntry`]: '',
+//     [`${table_id[0]}:TbComboBox`]: '',
+//     [`${table_id[0]}:TbComboBox:value`]: '',
+//     [`${table_id[0]}:TbFile`]: '',
+//     [`${table_id[0]}:TbDBEntryWizard`]: '',
+//     [`${table_id[0]}:TbInterval`]: '0 00:00:00',
+//     [`${table_id[0]}:TbString`]: '',
+//     [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
+//     //  [`${table_id[0]}:_ecid245193080`]: '',
+//     [`${table_id[0]}:TbTime`]: '',
+//     [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
+//     //   [`${table_id[0]}:_ecid245193082`]: '',
+//     [`${table_id[0]}:TbDBFile`]: '',
+//     [`${table_id[0]}:TbMultiList`]: '',
+//     [`${table_id[0]}:TbFloat`]: '',
+//     [`${table_id[0]}:TbInteger`]: '',
+//     [`${table_id[0]}:columnWidths`]: '',
+//     [`${table_id[0]}:selection`]: '0 0 1 1',
+//     [`${table_id[0]}:editCell`]: '',
+//     [`${table_id[0]}:rowHeights`]: '',
+//     [`${table_id[0]}:editedRows`]: '',
+//     [`${table_id[0]}:editControl`]: '',
+//     //   'mf:tp:_uid_5A0013F8_:curPos': '',
+//     [`${table_id[1]}:_fc_`]: '',
+//     [`${table_id[1]}:columnWidths`]: '',
+//     [`${popup[0]}:hasContent`]: 'true',
+//     [`${popup[1]}:hasContent`]: 'true',
+//     'lw.viewguid': viewguid,
+//     'javax.faces.ViewState': viewstate,
+//     'mf': 'true',
+//     '': ''
+//   });
+//   const config = {
+//     method: 'post',
+//     url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${switch_button}&ec_ajax=true&ts=${Date.now()}`,
+//     headers: {
+//       'host': 'apps.pertamina.com',
+//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+//       'accept': '*/*',
+//       'accept-language': 'en-US,en;q=0.5',
+//       'accept-encoding': '*',
+//       'content-type': 'application/x-www-form-urlencoded',
+//       'origin': 'https://apps.pertamina.com',
+//       'connection': 'keep-alive',
+//       'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+//       'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
+//     },
+//     data: data
+//   };
+
+//   return axios(config)
+//     .then(function (response) {
+
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
 
 async function sortSample(raw_sam) {
   var sample_malem = raw_sam.filter((sample_obj) => {
@@ -922,8 +1054,16 @@ async function main() {
     }
   })
   const sorted = await sortSample(samples_di)
-
+  const sorted1 = await sortSample(samples_ext)
   for (const val of Object.values(sorted)) {
+    if (val.length > 0) {
+      const casted = await castSample(val)
+      const reduced = stringRep(casted)
+      await sendMessage(reduced)
+      console.log(casted)
+    }
+  }
+  for (const val of Object.values(sorted1)) {
     if (val.length > 0) {
       const casted = await castSample(val)
       const reduced = stringRep(casted)
