@@ -58,7 +58,7 @@ async function LoginForm(jsession) {
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
       'referer': 'https://apps.pertamina.com/LIMS/login.htm',
-      'cookie': `${jsession}  ec_aurl=L1dlYkxJTVMvbG9naW4uaHRt;`,
+      'cookie': `${jsession}  ec_aurl=L0xJTVMvbG9naW4uaHRt;`,
       'upgrade-insecure-requests': '1'
     },
     maxRedirects: 0,
@@ -91,7 +91,7 @@ async function mainPage(jsession) {
       'accept-encoding': '*',
       'referer': 'https://apps.pertamina.com/LIMS/login.htm',
       'connection': 'keep-alive',
-      'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
+      'cookie': `${jsession} ec_aurl=L0xJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
       'upgrade-insecure-requests': '1'
     }
   };
@@ -103,6 +103,7 @@ async function mainPage(jsession) {
       const uid = dom1.window.document.getElementsByName('mf:workFlowTabPane:sel')[0].value
       const menus = dom1.window.document.querySelectorAll('.sub>.mc>.mct')
       const menus_array = Array.from(menus)
+      const ec_aurl = response.headers['set-cookie'][0]
       const all = menus_array.filter((x) => {
         const split = x.innerHTML.split(' ')[1]
         return split == "DI"
@@ -110,14 +111,14 @@ async function mainPage(jsession) {
         return x.parentElement.id.split(":")[1]
       })
 
-      return { viewstate1, uid, all }
+      return { viewstate1, uid, all, ec_aurl }
     })
     .catch(function (error) {
       console.log(error);
     });
 }
 
-async function openQuery(jsession, viewstate2, uid, uriid) {
+async function openQuery(jsession, viewstate2, uid, uriid, ec_aurl) {
   var data = qs.stringify({
     'mf:search:label': '',
     'mf:search': '',
@@ -143,7 +144,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
       'origin': 'https://apps.pertamina.com',
       'connection': 'keep-alive',
       'referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
-      'cookie': `${jsession} _ga=GA1.2.1113838315.1658209289; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`
+      'cookie': `${jsession} _ga=GA1.2.1113838315.1658209289; ${ec_aurl} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`
     },
     data: data,
     maxRedirects: 0
@@ -152,6 +153,7 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
   return axios(config)
     .then(function (response) {
       const xml_obj = (new XMLParser()).parse(response.data);
+      //const ec_url = response.config.headers.cookie.split(' ')[2]
       const uri = xml_obj.resp.eval.expr.split('\'')[3]
       return uri
     })
@@ -159,178 +161,321 @@ async function openQuery(jsession, viewstate2, uid, uriid) {
       console.log(error);
     });
 }
-
-async function openTable(jsession, uri) {
-  var options = {
+async function openTable(jsession4, uri, ec_aurl) {
+  let config = {
     method: 'GET',
-    url: `https://apps.pertamina.com/LIMS/${uri}`,
     headers: {
-      host: 'apps.pertamina.com',
-      'proxy-connection': 'keep-alive',
+      'host': 'apps.pertamina.com',
+      'connection': 'keep-alive',
+      'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Microsoft Edge";v="120"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
       'upgrade-insecure-requests': '1',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-      accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-      referer: 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'sec-fetch-site': 'same-origin',
+      'sec-fetch-mode': 'navigate',
+      'sec-fetch-user': '?1',
+      'sec-fetch-dest': 'document',
+      'referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
       'accept-encoding': '*',
       'accept-language': 'en-US,en;q=0.9',
-      cookie: `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt`
+      'cookie': `lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ${jsession4} lw_focus_=bWY6c2VhcmNo`,
     }
   };
 
+  try {
+    const response = await fetch(`https://apps.pertamina.com/LIMS/${uri}`, config);
+    const responseData = await response.text();
 
+    console.log(responseData);
 
-  return axios(options)
-    .then(function (response) {
-      const table_dom = new JSDOM(response.data)
-      const run_button = table_dom.window.document.getElementsByTagName('img')
-      const button_array = Array.from(run_button)
-      const button_filter = button_array.filter((x) => {
-        return x['title'] == 'Run'
-      })
-      const button_run_id = button_filter[0].parentElement.id.split(':')[2];
-      const table_el_arr = table_dom.window.document.getElementsByClassName('dataTableMain')
-      const table_id_arr = Array.from(table_el_arr).map((x) => {
-        return x.id.split(
-          ":mainRow"
-        )[0]
-      })
-      const popup_arr = table_dom.window.document.getElementsByClassName('popup')
-      const popup = Array.from(popup_arr).map((x) => {
-        return x.id
-      })
-      const viewguid = table_dom.window.document.getElementById('lw.viewguid').value
-      const viewstate = table_dom.window.document.getElementById('javax.faces.ViewState').value
-      const menus2 = table_dom.window.document.getElementsByClassName('mct')
-      const menus_array2 = Array.from(menus2)
-      const all2 = menus_array2.filter((x) => {
-        const split = x.innerHTML.split(' ')[1]
-        return split == "DI"
-      }).map((x) => {
-        return x.parentElement.id.split(":")[2]
-      })
-      const extern2 = menus_array2.filter((x) => {
-        const split = x.innerHTML.split(' ')[1]
-        return split == "EXT"
-      }).map((x) => {
-        return x.parentElement.id.split(":")[2]
-      })
-
-      return [[button_run_id, table_id_arr, popup, viewguid, viewstate], all2, extern2]
-    })
-    .catch(function (error) {
-      console.log(error);
+    const table_dom = new JSDOM(responseData);
+    const run_button = table_dom.window.document.getElementsByTagName('img');
+    const button_array = Array.from(run_button);
+    const button_filter = button_array.filter((x) => {
+      return x['title'] == 'Run';
     });
+    const button_run_id = button_filter[0].parentElement.id.split(':')[2];
+    const table_el_arr = table_dom.window.document.getElementsByClassName('dataTableMain');
+    const table_id_arr = Array.from(table_el_arr).map((x) => {
+      return x.id.split(":mainRow")[0];
+    });
+    const popup_arr = table_dom.window.document.getElementsByClassName('popup');
+    const popup = Array.from(popup_arr).map((x) => {
+      return x.id;
+    });
+    // const viewguid = table_dom.window.document.getElementById('lw.viewguid').value;
+    const viewstate = table_dom.window.document.getElementById('javax.faces.ViewState').value;
+    const menus2 = table_dom.window.document.getElementsByClassName('mct');
+    const menus_array2 = Array.from(menus2);
+    const all2 = menus_array2.filter((x) => {
+      const split = x.innerHTML.split(' ')[1];
+      return split == "DI";
+    }).map((x) => {
+      return x.parentElement.id.split(":")[2];
+    });
+    const extern2 = menus_array2.filter((x) => {
+      const split = x.innerHTML.split(' ')[1];
+      return split == "EXT";
+    }).map((x) => {
+      return x.parentElement.id.split(":")[2];
+    });
+
+    return [[button_run_id, table_id_arr, popup, viewstate], all2, extern2];
+  } catch (error) {
+    console.log(error);
+  }
 }
+// async function openTable(jsession4, uri, ec_aurl) {
+//   let config = {
+//     method: 'get',
+//     maxBodyLength: Infinity,
+//     url: `https://apps.pertamina.com/LIMS/${uri}`,
+//     headers: {
+//       'host': 'apps.pertamina.com',
+//       'connection': 'keep-alive',
+//       'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Microsoft Edge";v="120"',
+//       'sec-ch-ua-mobile': '?0',
+//       'sec-ch-ua-platform': '"Windows"',
+//       'upgrade-insecure-requests': '1',
+//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+//       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+//       'sec-fetch-site': 'same-origin',
+//       'sec-fetch-mode': 'navigate',
+//       'sec-fetch-user': '?1',
+//       'sec-fetch-dest': 'document',
+//       'referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+//       'accept-encoding': '*',
+//       'accept-language': 'en-US,en;q=0.9',
+//       'cookie': `lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ${jsession4} lw_focus_=bWY6c2VhcmNo`,
+//     }
+//   };
+//   var options = {
+//     method: 'GET',
+//     url: `https://apps.pertamina.com/LIMS/${uri}`,
+//     headers: {
+//       "Accept": '*/*',
+//       'Accept-Language': '*',
+//       "Connection": 'keep-alive',
+//       "Cookie": `lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton&ec_eid=onclick&ec_cid=loginForm%3AlogButton; ${jsession4} lw_focus_=bWY6c2VhcmNo; ${ec_aurl}`,
+//       "Host": 'apps.pertamina.com',
+//       "Referer": 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+//       'Sec-Fetch-Dest': 'document',
+//       'Sec-Fetch-Mode': 'navigate',
+//       'Sec-Fetch-Site': 'same-origin',
+//       'Sec-Fetch-User': '?1',
+//       'Upgrade-Insecure-Requests': "1",
+//       'origin': 'https://apps.pertamina.com',
+//       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+//       'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Microsoft Edge";v="120"',
+//       'sec-ch-ua-mobile': '?0',
+//       'sec-ch-ua-platform': "Windows"
+//     }
+//   };
 
 
 
-async function openDate(jsession, uri, run_button, table_id, popup, viewguid, viewstate) {
-  var data = qs.stringify({
-    'mf:search:label': '',
-    'mf:search': '',
-    [`${table_id[0]}:editcache`]: '',
-    [`${table_id[0]}:1:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:2:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:3:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:4:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:5:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:7:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:9:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:10:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:13:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:14:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:15:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:16:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:17:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:18:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:19:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:20:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:21:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:22:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:23:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:24:3:TbCheckBox`]: 'true',
-    [`${table_id[0]}:TbDBEntry`]: '',
-    [`${table_id[0]}:TbComboBox`]: '',
-    [`${table_id[0]}:TbComboBox:value`]: '',
-    [`${table_id[0]}:TbFile`]: '',
-    [`${table_id[0]}:TbDBEntryWizard`]: '',
-    [`${table_id[0]}:TbInterval`]: '0 00:00:00',
-    [`${table_id[0]}:TbString`]: '',
-    [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
-    //[`${table_id[0]}:_ecid245193080`]: '',
-    [`${table_id[0]}:TbTime`]: '',
-    [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
-    //   [`${table_id[0]}:_ecid245193082`]: '',
-    [`${table_id[0]}:TbDBFile`]: '',
-    [`${table_id[0]}:TbMultiList`]: '',
-    [`${table_id[0]}:TbFloa`]: '',
-    [`${table_id[0]}:TbInteger`]: '',
-    [`${table_id[0]}:TbDBEntry`]: '',
-    [`${table_id[0]}:TbComboBox`]: '',
-    [`${table_id[0]}:TbComboBox:value`]: '',
-    [`${table_id[0]}:TbFile`]: '',
-    [`${table_id[0]}:TbDBEntryWizard`]: '',
-    [`${table_id[0]}:TbInterval`]: '0 00:00:00',
-    [`${table_id[0]}:TbString`]: '',
-    [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
-    //  [`${table_id[0]}:_ecid245193080`]: '',
-    [`${table_id[0]}:TbTime`]: '',
-    [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
-    //   [`${table_id[0]}:_ecid245193082`]: '',
-    [`${table_id[0]}:TbDBFile`]: '',
-    [`${table_id[0]}:TbMultiList`]: '',
-    [`${table_id[0]}:TbFloat`]: '',
-    [`${table_id[0]}:TbInteger`]: '',
-    [`${table_id[0]}:columnWidths`]: '',
-    [`${table_id[0]}:selection`]: '0 0 1 1',
-    [`${table_id[0]}:editCell`]: '',
-    [`${table_id[0]}:rowHeights`]: '',
-    [`${table_id[0]}:editedRows`]: '',
-    [`${table_id[0]}:editControl`]: '',
-    //   'mf:tp:_uid_5A0013F8_:curPos': '',
-    [`${table_id[1]}:_fc_`]: '',
-    [`${table_id[1]}:columnWidths`]: '',
-    [`${popup[0]}:hasContent`]: 'true',
-    [`${popup[1]}:hasContent`]: 'true',
-    'lw.viewguid': viewguid,
-    'javax.faces.ViewState': viewstate,
-    'mf': 'true',
-    '': ''
+//   return axios(config)
+//     .then(function (response) {
+//       console.log(response.data)
+//       const table_dom = new JSDOM(response.data)
+//       const run_button = table_dom.window.document.getElementsByTagName('img')
+//       const button_array = Array.from(run_button)
+//       const button_filter = button_array.filter((x) => {
+//         return x['title'] == 'Run'
+//       })
+//       const button_run_id = button_filter[0].parentElement.id.split(':')[2];
+//       const table_el_arr = table_dom.window.document.getElementsByClassName('dataTableMain')
+//       const table_id_arr = Array.from(table_el_arr).map((x) => {
+//         return x.id.split(
+//           ":mainRow"
+//         )[0]
+//       })
+//       const popup_arr = table_dom.window.document.getElementsByClassName('popup')
+//       const popup = Array.from(popup_arr).map((x) => {
+//         return x.id
+//       })
+//       const viewguid = table_dom.window.document.getElementById('lw.viewguid').value
+//       const viewstate = table_dom.window.document.getElementById('javax.faces.ViewState').value
+//       const menus2 = table_dom.window.document.getElementsByClassName('mct')
+//       const menus_array2 = Array.from(menus2)
+//       const all2 = menus_array2.filter((x) => {
+//         const split = x.innerHTML.split(' ')[1]
+//         return split == "DI"
+//       }).map((x) => {
+//         return x.parentElement.id.split(":")[2]
+//       })
+//       const extern2 = menus_array2.filter((x) => {
+//         const split = x.innerHTML.split(' ')[1]
+//         return split == "EXT"
+//       }).map((x) => {
+//         return x.parentElement.id.split(":")[2]
+//       })
+
+//       return [[button_run_id, table_id_arr, popup, viewguid, viewstate], all2, extern2]
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+
+//     });
+// }
+
+async function openDate(jsession, uri, run_button, table_id, popup, viewstate) {
+  const formData = new URLSearchParams();
+  formData.append('mf:search:label', '');
+  formData.append('mf:search', '');
+  formData.append(`${table_id[0]}:editcache`, '');
+
+  // Append other form data parameters here...
+
+  formData.append('javax.faces.ViewState', viewstate);
+  formData.append('mf', 'true');
+  formData.append('', '');
+
+  const headers = new Headers({
+    'host': 'apps.pertamina.com',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+    'accept': '*/*',
+    'accept-language': 'en-US,en;q=0.5',
+    'accept-encoding': '*',
+    'content-type': 'application/x-www-form-urlencoded',
+    'origin': 'https://apps.pertamina.com',
+    'connection': 'keep-alive',
+    'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+    'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt;`
   });
-  var config = {
-    method: 'post',
-    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`,
-    headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-      'accept': '*/*',
-      'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': '*',
-      'content-type': 'application/x-www-form-urlencoded',
-      'origin': 'https://apps.pertamina.com',
-      'connection': 'keep-alive',
-      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
-      'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; `
-    },
-    data: data
-  };
 
-  return axios(config)
-    .then(function (response) {
-      const xml_obj = (new XMLParser()).parse(response.data);
-      const html = xml_obj.resp.updateComp.html
-      const dom = new JSDOM(html)
-      const button = dom.window.document.getElementsByTagName('button')[0].id
-      const html1 = xml_obj.resp.viewState
-      const dom1 = new JSDOM(html1)
-      const viewstate1 = dom1.window.document.getElementById('javax.faces.ViewState').value
-
-      return [button, dom, viewstate1]
-    })
-    .catch(function (error) {
-      console.log(error);
+  try {
+    const response = await fetch(`https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`, {
+      method: 'POST',
+      headers: headers,
+      body: formData
     });
+
+    const text = await response.text();
+    const xml_obj = (new XMLParser()).parse(text);
+    const html = xml_obj.resp.updateComp.html;
+    const dom = new JSDOM(html);
+    const button = dom.window.document.getElementsByTagName('button')[0].id;
+    const html1 = xml_obj.resp.viewState;
+    const dom1 = new JSDOM(html1);
+    const viewstate1 = dom1.window.document.getElementById('javax.faces.ViewState').value;
+
+    return [button, dom, viewstate1];
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+
+// async function openDate(jsession, uri, run_button, table_id, popup, viewstate) {
+//   var data = qs.stringify({
+//     'mf:search:label': '',
+//     'mf:search': '',
+//     [`${table_id[0]}:editcache`]: '',
+//     [`${table_id[0]}:1:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:2:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:3:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:4:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:5:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:7:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:9:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:10:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:13:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:14:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:15:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:16:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:17:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:18:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:19:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:20:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:21:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:22:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:23:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:24:3:TbCheckBox`]: 'true',
+//     [`${table_id[0]}:TbDBEntry`]: '',
+//     [`${table_id[0]}:TbComboBox`]: '',
+//     [`${table_id[0]}:TbComboBox:value`]: '',
+//     [`${table_id[0]}:TbFile`]: '',
+//     [`${table_id[0]}:TbDBEntryWizard`]: '',
+//     [`${table_id[0]}:TbInterval`]: '0 00:00:00',
+//     [`${table_id[0]}:TbString`]: '',
+//     [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
+//     //[`${table_id[0]}:_ecid245193080`]: '',
+//     [`${table_id[0]}:TbTime`]: '',
+//     [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
+//     //   [`${table_id[0]}:_ecid245193082`]: '',
+//     [`${table_id[0]}:TbDBFile`]: '',
+//     [`${table_id[0]}:TbMultiList`]: '',
+//     [`${table_id[0]}:TbFloa`]: '',
+//     [`${table_id[0]}:TbInteger`]: '',
+//     [`${table_id[0]}:TbDBEntry`]: '',
+//     [`${table_id[0]}:TbComboBox`]: '',
+//     [`${table_id[0]}:TbComboBox:value`]: '',
+//     [`${table_id[0]}:TbFile`]: '',
+//     [`${table_id[0]}:TbDBEntryWizard`]: '',
+//     [`${table_id[0]}:TbInterval`]: '0 00:00:00',
+//     [`${table_id[0]}:TbString`]: '',
+//     [`${table_id[0]}:TbDate`]: 'dd-mmm-yyyy',
+//     //  [`${table_id[0]}:_ecid245193080`]: '',
+//     [`${table_id[0]}:TbTime`]: '',
+//     [`${table_id[0]}:TbDateTime`]: 'dd-mmm-yyyy hh:mm:ss',
+//     //   [`${table_id[0]}:_ecid245193082`]: '',
+//     [`${table_id[0]}:TbDBFile`]: '',
+//     [`${table_id[0]}:TbMultiList`]: '',
+//     [`${table_id[0]}:TbFloat`]: '',
+//     [`${table_id[0]}:TbInteger`]: '',
+//     [`${table_id[0]}:columnWidths`]: '',
+//     [`${table_id[0]}:selection`]: '0 0 1 1',
+//     [`${table_id[0]}:editCell`]: '',
+//     [`${table_id[0]}:rowHeights`]: '',
+//     [`${table_id[0]}:editedRows`]: '',
+//     [`${table_id[0]}:editControl`]: '',
+//     //   'mf:tp:_uid_5A0013F8_:curPos': '',
+//     [`${table_id[1]}:_fc_`]: '',
+//     [`${table_id[1]}:columnWidths`]: '',
+//     [`${popup[0]}:hasContent`]: 'true',
+//     [`${popup[1]}:hasContent`]: 'true',
+//     'javax.faces.ViewState': viewstate,
+//     'mf': 'true',
+//     '': ''
+//   });
+//   var config = {
+//     method: 'post',
+//     url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=mf%3Atp%3A${run_button}&ec_ajax=true&ts=${Date.now()}`,
+//     headers: {
+//       'host': 'apps.pertamina.com',
+//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+//       'accept': '*/*',
+//       'accept-language': 'en-US,en;q=0.5',
+//       'accept-encoding': '*',
+//       'content-type': 'application/x-www-form-urlencoded',
+//       'origin': 'https://apps.pertamina.com',
+//       'connection': 'keep-alive',
+//       'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+//       'cookie': `${jsession} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt;`
+//     },
+//     data: data
+//   };
+
+//   return axios(config)
+//     .then(function (response) {
+//       const xml_obj = (new XMLParser()).parse(response.data);
+//       const html = xml_obj.resp.updateComp.html
+//       const dom = new JSDOM(html)
+//       const button = dom.window.document.getElementsByTagName('button')[0].id
+//       const html1 = xml_obj.resp.viewState
+//       const dom1 = new JSDOM(html1)
+//       const viewstate1 = dom1.window.document.getElementById('javax.faces.ViewState').value
+
+//       return [button, dom, viewstate1]
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
+
 async function clickOK(jsession, uri, button, dom, viewstate) {
   var date = moment().format("DD-MMM-YYYY")
   var date2 = moment().format("YYYY-MM-DD")
@@ -348,7 +493,6 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
   const inp = dom.window.document.getElementsByClassName("iconinput-input")[1].value
   const obj = {
     [`${doc[6].slice(0, -11)}:popupState`]: "popup",
-
     [`${doc[6].slice(0, -11)}:order`]: "3",
     "lw.viewguid": `${lwview}`,
     "javax.faces.ViewState": "",
@@ -371,41 +515,118 @@ async function clickOK(jsession, uri, button, dom, viewstate) {
   }
   const lwfocus = Buffer.from(doc[0].slice(0, -4)).toString('base64')
   const ecfocus = Buffer.from(button).toString('base64')
-  const data = qs.stringify(obj);
+  const data = new URLSearchParams(obj).toString();
   const but_arr = button.split(":")
-  var config = {
-    method: 'post',
-    url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`,
-    headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-      'content-type': 'application/x-www-form-urlencoded',
-      'accept': '*/*',
 
-      'origin': 'https://apps.pertamina.com',
-      'referer': `https://apps.pertamina.com/LIMS/${uri}`,
-      'accept-encoding': '*',
-      'accept-language': 'en-US,en;q=0.9',
-      'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; lw_focus_=${lwfocus}; ec_focus=${ecfocus}`
-    },
-    data: data
-  };
-
-  return axios(config)
-    .then(function (response) {
-      const xml_obj = (new XMLParser()).parse(response.data);
-      const html = xml_obj.resp.updateComp.html
-      const dom_table_final = new JSDOM(html)
-      const html1 = xml_obj.resp.viewState
-      const dom1 = new JSDOM(html1)
-      const viewstate = dom1.window.document.getElementById('javax.faces.ViewState').value
-      const onHidelink = xml_obj.resp.jsCall[0].comp
-      return { dom_table_final, viewstate, lwfocus, ecfocus, onHidelink }
-    })
-    .catch(function (error) {
-      console.log(error);
+  try {
+    const response = await fetch(`https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`, {
+      method: 'POST',
+      headers: {
+        'host': 'apps.pertamina.com',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+        'content-type': 'application/x-www-form-urlencoded',
+        'accept': '*/*',
+        'origin': 'https://apps.pertamina.com',
+        'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+        'accept-encoding': '*',
+        'accept-language': 'en-US,en;q=0.9',
+        'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; lw_focus_=${lwfocus}; ec_focus=${ecfocus}`
+      },
+      body: data
     });
+
+    const responseData = await response.text();
+    const xml_obj = (new XMLParser()).parse(responseData);
+    const html = xml_obj.resp.updateComp.html;
+    const dom_table_final = new JSDOM(html);
+    const html1 = xml_obj.resp.viewState;
+    const dom1 = new JSDOM(html1);
+    const newViewState = dom1.window.document.getElementById('javax.faces.ViewState').value;
+    const onHidelink = xml_obj.resp.jsCall[0].comp;
+
+    return { dom_table_final, viewstate: newViewState, lwfocus, ecfocus, onHidelink };
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+
+
+// async function clickOK(jsession, uri, button, dom, viewstate) {
+//   var date = moment().format("DD-MMM-YYYY")
+//   var date2 = moment().format("YYYY-MM-DD")
+
+//   const doc_arr = dom.window.document.getElementsByTagName('input')
+
+//   const doc = Array.from(doc_arr).map((x) => {
+//     return x.getAttribute('id')
+//   })
+//   const lwview = doc_arr[10].value
+//   const weblist = doc_arr[0].getAttribute('popup')
+//   const ecnum = doc[0].split(":")[0].slice(11, 14)
+//   const ecnum_int = parseInt(ecnum)
+//   const ec = doc[0].split(":")[0].slice(0, 11)
+//   const inp = dom.window.document.getElementsByClassName("iconinput-input")[1].value
+//   const obj = {
+//     [`${doc[6].slice(0, -11)}:popupState`]: "popup",
+
+//     [`${doc[6].slice(0, -11)}:order`]: "3",
+//     "lw.viewguid": `${lwview}`,
+//     "javax.faces.ViewState": "",
+//     [`${doc[0].split(":")[0]}`]: "true",
+//     [`${doc[0].slice(0, -4)}`]: "",
+//     [`${doc[0].slice(0, -4)}:value`]: "",
+//     [`${doc[2].slice(0, -2)}`]: inp,
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 2}:_fc_`]: "",
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 2}`]: date2,
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 1}:hasContent`]: "true",
+//     [`${doc[4].slice(0, -2)}`]: inp,
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 4}:_fc_`]: "",
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 4}`]: date2,
+//     [`${doc[0].split(":")[0]}:${ec}${ecnum_int + 3}:hasContent`]: "true",
+//     [`${doc[0].split(":")[0]}:${weblist}:hasContent`]: "true",
+//     [`${doc[6].slice(0, -11)}:windowState`]: "window:normal;",
+//     [`${doc[6].slice(0, -11)}:hasContent`]: "true",
+//     [`${doc[6].slice(0, -11)}:windowSize`]: "420@209",
+//     "": ""
+//   }
+//   const lwfocus = Buffer.from(doc[0].slice(0, -4)).toString('base64')
+//   const ecfocus = Buffer.from(button).toString('base64')
+//   const data = qs.stringify(obj);
+//   const but_arr = button.split(":")
+//   var config = {
+//     method: 'post',
+//     url: `https://apps.pertamina.com/LIMS/${uri}?ec_eid=onclick&ec_cid=${but_arr[0]}%3A${but_arr[1]}&ec_ajax=true&ts=${Date.now()}`,
+//     headers: {
+//       'host': 'apps.pertamina.com',
+//       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+//       'content-type': 'application/x-www-form-urlencoded',
+//       'accept': '*/*',
+
+//       'origin': 'https://apps.pertamina.com',
+//       'referer': `https://apps.pertamina.com/LIMS/${uri}`,
+//       'accept-encoding': '*',
+//       'accept-language': 'en-US,en;q=0.9',
+//       'cookie': `${jsession} ec_aurl=L1dlYkxJTVMvZXJyb3IuaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton; lw_focus_=${lwfocus}; ec_focus=${ecfocus}`
+//     },
+//     data: data
+//   };
+
+//   return axios(config)
+//     .then(function (response) {
+//       const xml_obj = (new XMLParser()).parse(response.data);
+//       const html = xml_obj.resp.updateComp.html
+//       const dom_table_final = new JSDOM(html)
+//       const html1 = xml_obj.resp.viewState
+//       const dom1 = new JSDOM(html1)
+//       const viewstate = dom1.window.document.getElementById('javax.faces.ViewState').value
+//       const onHidelink = xml_obj.resp.jsCall[0].comp
+//       return { dom_table_final, viewstate, lwfocus, ecfocus, onHidelink }
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
 async function onHide(jsession, uri, viewstate, lwfocus, ecfocus, onHidelink) {
   var options = {
     method: 'POST',
@@ -666,9 +887,9 @@ async function main() {
   console.time()
   const jsession1 = await One();
   const jsession2 = await LoginForm(jsession1)
-  const { viewstate1, uid, all } = await mainPage(jsession2)
-  const uri_1 = await openQuery(jsession2, viewstate1, uid, all)
-  const open_table_1 = await openTable(jsession2, uri_1)
+  const { viewstate1, uid, all, ec_aurl } = await mainPage(jsession2)
+  const uri_1 = await openQuery(jsession2, viewstate1, uid, all, ec_aurl)
+  const open_table_1 = await openTable(jsession2, uri_1, ec_aurl)
   const open_date_1 = await openDate(jsession2, uri_1, ...open_table_1[0])
   const { dom_table_final, viewState5, lwfocus, ecfocus, onHidelink } = await clickOK(jsession2, uri_1, ...open_date_1)
   const viewstate6 = await onHide(jsession2, uri_1, viewState5, lwfocus, ecfocus, onHidelink)
