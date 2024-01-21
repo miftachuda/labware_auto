@@ -970,7 +970,7 @@ async function sendMessage(message) {
   let encoded = encodeURIComponent(message);
   var config = {
     method: 'post',
-    url: `https://api.telegram.org/bot5266529032:AAG6oq2TOmKOXrt5qaeVLk3ehvYF0bJZ6ko/sendMessage?chat_id=-887497688&parse_mode=HTML&text=${encoded}`,
+    url: `https://api.telegram.org/5640241446:AAEhw-qe6D7YD2NiuSn1UigfvL4w1yGE0HU/sendMessage?chat_id=-887497688&parse_mode=HTML&text=${encoded}`,
     headers: {}
   };
 
