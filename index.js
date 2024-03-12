@@ -622,12 +622,19 @@ async function main() {
   await refreshTable(jsession2, uri_1, open_table_1[2], open_table_1[0][2], open_table_1[0][3], open_table_1[0][4], viewstate6)
   const open_date_2 = await openDate(jsession2, uri_1, ...open_table_1[0])
   const x = await clickOK(jsession2, uri_1, ...open_date_2)
+  async function delayScriptExecution() {
+    await new Promise(resolve => setTimeout(resolve, 300000));
+    console.log('Script execution delayed by 3 seconds.');
+  }
 
+  // Call the function
+  delayScriptExecution();
 
   if (dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
     const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
     var data = await proceesArray(sample_arr_di)
     if (data == "Empty") {
+      await delayScriptExecution()
       main();
     } else {
       if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
