@@ -459,8 +459,7 @@ async function sortSample(raw_sam) {
     return date.getHours() >= 16 && date.getHours() < 23
 
   })
-  return { sample_malem, sample_pagi, sample_sore }
-
+  return [sample_malem, sample_pagi, sample_sore]
 }
 function detectShift(sample_obj) {
   if (sample_obj.length > 0) {
@@ -579,13 +578,35 @@ async function proceesArray(array_in) {
     }
   })
   const sorted = await sortSample(samples_di)
-  for (const val of Object.values(sorted)) {
+  for (const val of sorted) {
     if (val.length > 0) {
       const casted = await castSample(val)
       const reduced = stringRep(casted)
       await sendMessage(reduced)
       console.log(casted)
     }
+  }
+
+
+  function ShiftNow() {
+    var date = new Date()
+    if (date.getHours() < 8) {
+      return "Malam"
+    } else if (date.getHours() >= 8 && date.getHours() < 16) {
+      return "Pagi"
+    } else {
+      return "Sore"
+    }
+  }
+  const shift = ShiftNow()
+  if (sorted[2].length > 3 && shift == "Sore") {
+    return "Sore"
+  } else if (sorted[1].length > 3 && shift == "pagi") {
+    return "Pagi"
+  } else if (sorted[0].length > 3 && shift == "Malam") {
+    return "Malam"
+  } else {
+    return "Empty"
   }
 }
 async function main() {
@@ -603,21 +624,26 @@ async function main() {
   const x = await clickOK(jsession2, uri_1, ...open_date_2)
 
 
-  if (dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1]) {
+  if (dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
     const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-    await proceesArray(sample_arr_di)
+    var data = await proceesArray(sample_arr_di)
+    if (data == "Empty") {
+      main();
+    } else {
+      if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
+        console.log("dont noe")
+        const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
+        await proceesArray(sample_arr_ext)
+      } else {
+        console.log("No data yet")
+        await sendMessage("LOC I & LOC III No data yet")
+      }
+    }
   } else {
     console.log("No data yet")
     await sendMessage("LOC II No data yet")
   }
-  if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1]) {
-    console.log("dont noe")
-    const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-    await proceesArray(sample_arr_ext)
-  } else {
-    console.log("No data yet")
-    await sendMessage("EXT No data yet")
-  }
+
 
 
   console.timeEnd()
