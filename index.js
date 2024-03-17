@@ -1,4 +1,4 @@
-const axios = require("axios");
+const axiost = require("axios");
 const { JSDOM } = require("jsdom");
 const { XMLParser } = require("fast-xml-parser");
 var qs = require('qs');
@@ -7,36 +7,37 @@ const moment = require("moment/moment");
 
 
 
+
 async function One() {
   var config = {
-    method: "get",
-    url: "https://apps.pertamina.com/LIMS/login.htm",
+    method: "GET",
     headers: {
-      host: "apps.pertamina.com",
-      "user-agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
-      accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-      "accept-language": "en-US,en;q=0.5",
-      "accept-encoding": "gzip, deflate",
-      connection: "keep-alive",
-      "upgrade-insecure-requests": "1",
+      "Host": "apps.pertamina.com",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate",
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
     },
   };
 
-  return axios(config)
-    .then(function (response) {
-      let cookie = response.headers["set-cookie"][0].split(" ")[0];
-      return cookie;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  try {
+    const response = await fetch("https://apps.pertamina.com/LIMS/login.htm", config);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    let cookie = response.headers.get("set-cookie").split(" ")[0];
+    return cookie;
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+    throw error; // Propagate the error for handling higher up in the call stack if needed
+  }
 }
 
 
 async function LoginForm(jsession) {
-  var data = qs.stringify({
+  const data = new URLSearchParams({
     'loginForm:username': 'sutanto',
     'loginForm:password': 'XXXXXXXXXXX',
     'loginForm:password_lwentransmitter': '4kZBuVwmDa4NXnaSw2RjXxM6Ruda5TaVmxG2jnZaeSiGIBbBZx//5AxCpM+3KKHhkoeAEFDe2ZELhYG6WpI/PRfBuahkPL6iRRlX5wBkCi4o37U5KOaJyADWcgvfHZIf1knogAUE2ySUqwFEWmA17YYnYCaaOjsl1AV887VeG6U=',
@@ -44,82 +45,87 @@ async function LoginForm(jsession) {
     'javax.faces.ViewState': 'ecruiser.util.SerializedComponent$TreeStructure@307106c3',
     'loginForm': 'true'
   });
-  var config = {
-    method: 'post',
-    url: 'https://apps.pertamina.com/LIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+
+  const config = {
+    method: 'POST',
     headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': '*',
-      'content-length': 427,
-      'content-type': 'application/x-www-form-urlencoded',
-      'origin': 'https://apps.pertamina.com',
-      'connection': 'keep-alive',
-      'referer': 'https://apps.pertamina.com/LIMS/login.htm',
-      'cookie': `${jsession}  ec_aurl=L0xJTVMvbG9naW4uaHRt;`,
-      'upgrade-insecure-requests': '1'
+      'Host': 'apps.pertamina.com',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.5',
+      'Accept-Encoding': '*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': data.toString().length.toString(),
+      'Origin': 'https://apps.pertamina.com',
+      'Connection': 'keep-alive',
+      'Referer': 'https://apps.pertamina.com/LIMS/login.htm',
+      'Cookie': `${jsession}  ec_aurl=L0xJTVMvbG9naW4uaHRt;`,
+      'Upgrade-Insecure-Requests': '1'
     },
-    maxRedirects: 0,
-    data: data,
-    validateStatus: function (status) {
-      return status >= 200 && status <= 302
-    }
+    redirect: 'manual',
+    body: data,
   };
 
-  return axios(config)
-    .then(function (response) {
-      let cookie1 = response.headers["set-cookie"][2].split(" ")[0];
-      return cookie1
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  try {
+    const response = await fetch('https://apps.pertamina.com/LIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton', config);
+
+
+    const setCookieHeader = response.headers.get('set-cookie');
+    const cookie1 = setCookieHeader.split(", ")[4].split(" ")[0];
+    return cookie1;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
+
 
 async function mainPage(jsession) {
-
   var config = {
-    method: 'get',
-    url: 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+    method: 'GET',
     headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': '*',
-      'referer': 'https://apps.pertamina.com/LIMS/login.htm',
-      'connection': 'keep-alive',
-      'cookie': `${jsession} ec_aurl=L0xJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
-      'upgrade-insecure-requests': '1'
+      'Host': 'apps.pertamina.com',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.5',
+      'Accept-Encoding': '*',
+      'Referer': 'https://apps.pertamina.com/LIMS/login.htm',
+      'Connection': 'keep-alive',
+      'Cookie': `${jsession} ec_aurl=L0xJTVMvbG9naW4uaHRt; lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`,
+      'Upgrade-Insecure-Requests': '1'
     }
   };
 
-  return axios(config)
-    .then(function (response) {
-      const dom1 = new JSDOM(response.data)
-      const viewstate1 = dom1.window.document.getElementById("javax.faces.ViewState").value
-      const uid = dom1.window.document.getElementsByName('mf:workFlowTabPane:sel')[0].value
-      const menus = dom1.window.document.querySelectorAll('.sub>.mc>.mct')
-      const menus_array = Array.from(menus)
-      const ec_aurl = response.headers['set-cookie'][0]
-      const all = menus_array.filter((x) => {
-        const split = x.innerHTML.split(' ')[1]
-        return split == "DI"
-      }).map((x) => {
-        return x.parentElement.id.split(":")[1]
-      })
+  try {
+    const response = await fetch('https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton', config);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
 
-      return { viewstate1, uid, all, ec_aurl }
-    })
-    .catch(function (error) {
-      console.log(error);
+    const htmlText = await response.text();
+    const dom1 = new JSDOM(htmlText);
+    const viewstate1 = dom1.window.document.getElementById("javax.faces.ViewState").value;
+    const uid = dom1.window.document.getElementsByName('mf:workFlowTabPane:sel')[0].value;
+    const menus = dom1.window.document.querySelectorAll('.sub>.mc>.mct');
+    const menus_array = Array.from(menus);
+    const ec_aurl = response.headers.get('set-cookie');
+    const all = menus_array.filter((x) => {
+      const split = x.innerHTML.split(' ')[1];
+      return split == "DI";
+    }).map((x) => {
+      return x.parentElement.id.split(":")[1];
     });
+
+    return { viewstate1, uid, all, ec_aurl };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
+
 async function openQuery(jsession, viewstate2, uid, uriid, ec_aurl) {
-  var data = qs.stringify({
+  var data = new URLSearchParams({
     'mf:search:label': '',
     'mf:search': '',
     'mf:workFlowTabPane:sel': uid,
@@ -130,36 +136,40 @@ async function openQuery(jsession, viewstate2, uid, uriid, ec_aurl) {
     'mf': 'true',
     '': ''
   });
+
   var config = {
-    method: 'post',
-    url: `https://apps.pertamina.com/LIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`,
+    method: 'POST',
     headers: {
-      'host': 'apps.pertamina.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-      'accept': '*/*',
-      'accept-language': 'en-US,en;q=0.5',
-      'accept-encoding': '*',
-      'content-length': 289,
-      'content-type': 'application/x-www-form-urlencoded',
-      'origin': 'https://apps.pertamina.com',
-      'connection': 'keep-alive',
-      'referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
-      'cookie': `${jsession} _ga=GA1.2.1113838315.1658209289; ${ec_aurl} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`
+      'Host': 'apps.pertamina.com',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
+      'Accept': '*/*',
+      'Accept-Language': 'en-US,en;q=0.5',
+      'Accept-Encoding': '*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': data.toString().length.toString(),
+      'Origin': 'https://apps.pertamina.com',
+      'Connection': 'keep-alive',
+      'Referer': 'https://apps.pertamina.com/LIMS/index.htm?init_weblims=true&ec_eid=onclick&ec_cid=loginForm%3AlogButton',
+      'Cookie': `${jsession} _ga=GA1.2.1113838315.1658209289; ${ec_aurl} lims_dsNameCookie=LabWareV6Prod; queryStringCookie=ec_eid=onclick&ec_cid=loginForm%3AlogButton`
     },
-    data: data,
-    maxRedirects: 0
+    body: data,
+    redirect: 'manual'
   };
 
-  return axios(config)
-    .then(function (response) {
-      const xml_obj = (new XMLParser()).parse(response.data);
-      //const ec_url = response.config.headers.cookie.split(' ')[2]
-      const uri = xml_obj.resp.eval.expr.split('\'')[3]
-      return uri
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  try {
+    const response = await fetch(`https://apps.pertamina.com/LIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`, config);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const xmlText = await response.text();
+    const xml_obj = (new XMLParser()).parse(xmlText);
+    const uri = xml_obj.resp.eval.expr.split('\'')[3];
+    return uri;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 async function openTable(jsession4, uri, ec_aurl) {
   let config = {
@@ -503,10 +513,11 @@ async function castSample(sam) {
 }
 async function sendMessage(message) {
   console.log(message)
+  const pro_agent = require('proxying-agent').globalize('http://miftachul.huda:pertamina%402025@172.17.3.161:8080');
   async function callAxiosWithRetry(config, depth, failMassage) {
     const wait = (ms) => new Promise((res) => setTimeout(res, ms));
     try {
-      return await axios(config)
+      return await axiost(config)
     } catch (e) {
       if (depth > 10) {
         throw e;
@@ -519,6 +530,8 @@ async function sendMessage(message) {
   }
   let encoded = encodeURIComponent(message);
   var config = {
+    httpAgent: pro_agent,
+    httpsAgent: pro_agent,
     method: 'post',
     url: `https://api.telegram.org/bot5266529032:AAG6oq2TOmKOXrt5qaeVLk3ehvYF0bJZ6ko/sendMessage?chat_id=-805440157&parse_mode=HTML&text=${encoded}`,
     headers: {}
@@ -578,14 +591,7 @@ async function proceesArray(array_in) {
     }
   })
   const sorted = await sortSample(samples_di)
-  for (const val of sorted) {
-    if (val.length > 0) {
-      const casted = await castSample(val)
-      const reduced = stringRep(casted)
-      await sendMessage(reduced)
-      console.log(casted)
-    }
-  }
+
 
 
   function ShiftNow() {
@@ -599,18 +605,18 @@ async function proceesArray(array_in) {
     }
   }
   const shift = ShiftNow()
-  if (sorted[2].length > 3 && shift == "Sore") {
-    return "Sore"
-  } else if (sorted[1].length > 3 && shift == "pagi") {
-    return "Pagi"
-  } else if (sorted[0].length > 3 && shift == "Malam") {
-    return "Malam"
+  if (sorted[2].length > 5 && shift == "Sore") {
+    return ["Sore", sorted]
+  } else if (sorted[1].length > 5 && shift == "pagi") {
+    return ["Pagi", sorted]
+  } else if (sorted[0].length > 5 && shift == "Malam") {
+    return ["Malam", sorted]
   } else {
-    return "Empty"
+    return ["Empty", sorted]
   }
 }
 async function main() {
-  console.time()
+  const startTime = performance.now();
   const jsession1 = await One();
   const jsession2 = await LoginForm(jsession1)
   const { viewstate1, uid, all, ec_aurl } = await mainPage(jsession2)
@@ -627,33 +633,52 @@ async function main() {
     console.log('Script execution delayed by 3 seconds.');
   }
 
-  // Call the function
-  delayScriptExecution();
-
-  if (dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
-    const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-    var data = await proceesArray(sample_arr_di)
-    if (data == "Empty") {
-      await delayScriptExecution()
-      main();
-    } else {
-      if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children.length > 0) {
-        console.log("dont noe")
-        const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-        await proceesArray(sample_arr_ext)
+  // var test = dom_table_final.window.document.getElementsByClassName('dataTableInner')
+  if (dom_table_final.window.document.getElementsByClassName('dataTableInner')) {
+    if (dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
+      const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
+      var data = await proceesArray(sample_arr_di)
+      if (data[0] != "Empty") {
+        console.log("delay 5 minutes")
+        await delayScriptExecution()
+        console.log("retry affter 5 minutes")
+        main();
       } else {
-        console.log("No data yet")
-        await sendMessage("LOC I & LOC III No data yet")
+
+        for (const val of data[1]) {
+          if (val.length > 0) {
+            const casted = await castSample(val)
+            const reduced = stringRep(casted)
+            await sendMessage(reduced)
+          }
+        }
+
+        if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
+          console.log("dont noe")
+          const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
+          const data1 = await proceesArray(sample_arr_ext)
+          for (const val of data1[1]) {
+            if (val.length > 0) {
+              const casted = await castSample(val)
+              const reduced = stringRep(casted)
+              await sendMessage(reduced)
+            }
+          }
+        } else {
+          console.log("LOC I & LOC III No data yet")
+          await sendMessage("LOC I & LOC III No data yet")
+        }
       }
+    } else {
+      console.log("LOC II No data yet")
+      await sendMessage("LOC II No data yet")
     }
   } else {
-    console.log("No data yet")
-    await sendMessage("LOC II No data yet")
+    console.log("table not available")
   }
-
-
-
-  console.timeEnd()
-
+  const endTime = performance.now();
+  const executionTime = endTime - startTime;
+  const formattedTime = (executionTime / 1000).toFixed(2) + " Seconds";
+  await sendMessage(formattedTime)
 }
 main();

@@ -1,0 +1,98 @@
+"
+<!DOCTYPE html>\n <html>
+
+<head>
+    <title>Welcome to LabWare 7</title>
+    <link rel=\"stylesheet\" type=\"text/css\" href=\"common/css/lw-theme/jquery-ui-1.10.3.custom.css\">
+    <link rel=\"stylesheet\" type=\"text/css\" href=\"common/css/labware.css\">
+    <link rel=\"stylesheet\" type=\"text/css\" href=\"common/css/login.css\">
+    <link id=\"favicon\" rel=\"shortcut icon\" href=\"img/LabWare-7.ico\">
+    </link>
+    <script type=\"text/javascript\" src=\"js/jquery-1.8.3.min.js\"></script>
+    <script type=\"text/javascript\" src=\"js/jquery-ui-1.8.22.custom.min.js\"></script>
+    <script type=\"text/javascript\" src=\"common/js/jsencrypt.js\"></script>
+    <script language=\"JavaScript\" src=\"labware.js\" type=\"text/javascript\"></script>
+    <script language=\"JavaScript\"
+        type=\"text/javascript\">\n            $(document).ready(function(e) {\n                var $input = $('#refresh');\n\n                $input.val() == 'yes' ? location.reload(true) : $input.val('yes');\n            });\n        </script>
+</head>
+
+<body id=\"login-bg\"><a href=\"http://www.labware.com\" target=\"_blank\"><img src=\"img/labware-logo.png\"
+            alt=\"LabWare Logo\" id=\"login-logo\" border=\"0\"></img></a>
+    <div id=\"login-pane\">
+        <div id=\"login-form-bg\"><input type=\"hidden\" id=\"refresh\" value=\"no\">
+            <script language=\"JavaScript\" type=\"text/javascript\"
+                src=\"/LIMS/login.htm?ec_resp=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ImVjcnVpc2VyLnNjcmlwdC5mcmFtZXdvcmsuRnJhbWV3b3JrR3JvdXAi.mjpakk3VW29ZInySjlPo6HuXlWXhCWtuCZJojaF_WiY&amp;ts=1710690087851&amp;loc=en_US\"></script>
+            <form id=\"loginForm\" action=\"/LIMS/login.htm\" method=\"post\" onsubmit=\"return false;\">
+                <p class=\"login-title\" style=\"padding-bottom: 5px;\">LabWare 7</p>
+                <div id=\"loginForm:_ecid16\"
+                    style=\"padding-left:25px;padding-right:25px;text-align:-moz-center;text-align:-khtml-center;text-align:center;color:red;font-weight:bold;\">
+                </div><br><br><span id=\"loginForm:ecid_e3fc55b318d168e4be7ebca07223f239\"></span>
+                <div id=\"loginForm:login\" style=\"text-align:center;\">
+                    <table cellspacing=\"0\" cellpadding=\"3\" border=\"1\" style=\"width: 100%; padding: 20px 40px 20px
+                        20px;\">
+                        <tr>
+                            <td valign=\"top\" style=\"text-align:right;\"><span
+                                    id=\"loginForm:ecid_e3b5e29918d168e4bf3ebca07224d2e8\" class=\"formLabel\">User
+                                    Name</span></td>
+                            <td valign=\"top\" style=\"text-align:left;\"><input id=\"loginForm:username\"
+                                    class=\"login-input ui-widget-content ui-corner-all\" name=\"loginForm:username\" />
+                                <script language=\"JavaScript\"
+                                    type=\"text/JavaScript\">ec.focus.setFocus(\"loginForm:username\");ec.focus.applyFocus();</script>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan=\"2\" height=\"5\"></td>
+                        </tr>
+                        <tr>
+                            <td valign=\"top\" style=\"text-align:right;\"><span
+                                    id=\"loginForm:ecid_e3b5e29918d168e4bf3ebca072258a43\"
+                                    class=\"formLabel\">Password</span></td>
+                            <td valign=\"top\" style=\"text-align:left;\">
+                                <script language=\"JavaScript\"
+                                    type=\"text/javascript\">window.encrypt_password = function(input) {  var size = input.length;  if(input == null || size == 0) { return true; }  var hiddenInputValue = document.getElementById('loginForm:password_lwentransmitter').value;  if(input == hiddenInputValue) { return true; }   var encrypt = new JSEncrypt();  encrypt.setPublicKey('-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB-----END PUBLIC KEY-----');  var encrypted = encrypt.encrypt(input); document.getElementById('loginForm:password_lwentransmitter').value = encrypted;  return true;};window.checkEnter = function (input, e) {  if(e != null){    var key = (navigator.appName == \"Netscape\") ? e.which : e.keyCode;    if(key == 13) {      encryptLabWarePwd_password(input);    }    return true;  }};window.encryptLabWarePwd_password = function() {encrypt_password(document.getElementById('loginForm:password').value);document.getElementById('loginForm:password').value='XXXXXXXXXXX';};</script>
+                                <input id=\"loginForm:password\" class=\"login-input ui-widget-content ui-corner-all\"
+                                    name=\"loginForm:password\" autocomplete=\"off\"
+                                    onchange=\"encryptLabWarePwd_password();\"
+                                    onkeydown=\"if(ec.util.isIE){checkEnter(this, event);};\" type=\"password\"
+                                    autocomplete=\"off\"><input name=\"loginForm:password_lwentransmitter\"
+                                    id=\"loginForm:password_lwentransmitter\" type=\"hidden\" /></input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td align=\"left\" style=\"padding: 10px;vertical-align: middle\"><input
+                                    id=\"loginForm:chkRememberMe\" style=\"display:none\" />
+                                <div id=\"loginForm:_ecid23\" style=\"display:none\"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td valign=\"top\" style=\"text-align:left;\">
+                                <div><button id=\"loginForm:logButton\" class=\"btn btn-blue\" onclick=\"return
+                                        ec.er(this,'onclick',false,null,null,null,event)\" style=\"margin-left: 8px;
+                                        padding:8px 10px 8px 10px;font-size:1.0em;min-width:56px;\"
+                                        type=\"submit\">Login</button></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div><input type=\"hidden\" name=\"javax.faces.ViewState\" id=\"javax.faces.ViewState\"
+                    value=\"ecruiser.util.SerializedComponent$TreeStructure@46bfe308\" autocomplete=\"off\" /><input
+                    type=\"hidden\" name=\"loginForm\" value=\"true\" />
+            </form>
+            <form id=\"newSeesionForm\" action=\"/LIMS/login.htm\" method=\"post\" onsubmit=\"return false\">
+                <div id=\"newSeesionForm:newSession\" style=\"display:none\"></div><input type=\"hidden\"
+                    name=\"javax.faces.ViewState\" id=\"javax.faces.ViewState\"
+                    value=\"ecruiser.util.SerializedComponent$TreeStructure@46bfe308\" autocomplete=\"off\" /><input
+                    type=\"hidden\" name=\"newSeesionForm\" value=\"true\" />
+            </form>
+            <form id=\"roleForm\" action=\"/LIMS/login.htm\" method=\"post\" onsubmit=\"return false;\">
+                <div id=\"roleForm:role\" style=\"display:none\"></div><input type=\"hidden\"
+                    name=\"javax.faces.ViewState\" id=\"javax.faces.ViewState\"
+                    value=\"ecruiser.util.SerializedComponent$TreeStructure@46bfe308\" autocomplete=\"off\" /><input
+                    type=\"hidden\" name=\"roleForm\" value=\"true\" />
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>"
