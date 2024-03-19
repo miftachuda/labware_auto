@@ -606,11 +606,11 @@ async function proceesArray(array_in) {
   }
   const shift = ShiftNow()
   if (sorted[2].length > 5 && shift == "Sore") {
-    return ["Sore", sorted]
-  } else if (sorted[1].length > 5 && shift == "pagi") {
-    return ["Pagi", sorted]
+    return ["Sore", sorted[2]]
+  } else if (sorted[1].length > 5 && shift == "Pagi") {
+    return ["Pagi", sorted[1]]
   } else if (sorted[0].length > 5 && shift == "Malam") {
-    return ["Malam", sorted]
+    return ["Malam", sorted[0]]
   } else {
     return ["Empty", sorted]
   }
@@ -629,7 +629,7 @@ async function main() {
   const open_date_2 = await openDate(jsession2, uri_1, ...open_table_1[0])
   const x = await clickOK(jsession2, uri_1, ...open_date_2)
   async function delayScriptExecution() {
-    await new Promise(resolve => setTimeout(resolve, 300000));
+    await new Promise(resolve => setTimeout(resolve, 3000));
     console.log('Script execution delayed by 3 seconds.');
   }
 
@@ -638,11 +638,11 @@ async function main() {
     if (dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
       const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
       var data = await proceesArray(sample_arr_di)
-      if (data[0] != "Empty") {
+      if (data[0] == "Empty") {
         console.log("delay 5 minutes")
         await delayScriptExecution()
         console.log("retry affter 5 minutes")
-        main();
+        await main();
       } else {
 
         for (const val of data[1]) {
@@ -654,7 +654,6 @@ async function main() {
         }
 
         if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
-          console.log("dont noe")
           const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
           const data1 = await proceesArray(sample_arr_ext)
           for (const val of data1[1]) {
