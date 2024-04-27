@@ -4,10 +4,6 @@ const { XMLParser } = require("fast-xml-parser");
 var qs = require('qs');
 const moment = require("moment/moment");
 
-
-
-
-
 async function One() {
   var config = {
     method: "GET",
@@ -68,8 +64,6 @@ async function LoginForm(jsession) {
 
   try {
     const response = await fetch('https://apps.pertamina.com/LIMS/login.htm?ec_eid=onclick&ec_cid=loginForm%3AlogButton', config);
-
-
     const setCookieHeader = response.headers.get('set-cookie');
     const cookie1 = setCookieHeader.split(", ")[4].split(" ")[0];
     return cookie1;
@@ -513,7 +507,7 @@ async function castSample(sam) {
 }
 async function sendMessage(message) {
   console.log(message)
-  const pro_agent = require('proxying-agent').globalize('http://miftachul.huda:pertamina%402025@172.17.3.161:8080');
+  // const pro_agent = require('proxying-agent').globalize('http://miftachul.huda:pertamina%402025@172.17.3.162:8080');
   async function callAxiosWithRetry(config, depth, failMassage) {
     const wait = (ms) => new Promise((res) => setTimeout(res, ms));
     try {
@@ -530,8 +524,8 @@ async function sendMessage(message) {
   }
   let encoded = encodeURIComponent(message);
   var config = {
-    httpAgent: pro_agent,
-    httpsAgent: pro_agent,
+    // httpAgent: pro_agent,
+    // httpsAgent: pro_agent,
     method: 'post',
     url: `https://api.telegram.org/bot5266529032:AAG6oq2TOmKOXrt5qaeVLk3ehvYF0bJZ6ko/sendMessage?chat_id=-805440157&parse_mode=HTML&text=${encoded}`,
     headers: {}
@@ -579,7 +573,7 @@ function stringRep(text) {
   return str
 }
 async function proceesArray(array_in) {
-  const samples_di = Array.from(array_in).map((x) => {
+  const samples = Array.from(array_in).map((x) => {
     const sample = x.children
     return {
       section: sample[2].innerHTML,
@@ -590,7 +584,7 @@ async function proceesArray(array_in) {
       unit: sample[7].innerHTML
     }
   })
-  const sorted = await sortSample(samples_di)
+  const sorted = await sortSample(samples)
 
 
 
@@ -605,11 +599,16 @@ async function proceesArray(array_in) {
     }
   }
   const shift = ShiftNow()
-  if (sorted[2].length > 5 && shift == "Sore") {
+  if (samples[0].section === "LOC2") {
+    min_sample = 5
+  } else {
+    min_sample = 3
+  }
+  if (sorted[2].length > min_sample && shift == "Sore") {
     return ["Sore", sorted[2]]
-  } else if (sorted[1].length > 5 && shift == "Pagi") {
+  } else if (sorted[1].length > min_sample && shift == "Pagi") {
     return ["Pagi", sorted[1]]
-  } else if (sorted[0].length > 5 && shift == "Malam") {
+  } else if (sorted[0].length > min_sample && shift == "Malam") {
     return ["Malam", sorted[0]]
   } else {
     return ["Empty", sorted]
@@ -623,61 +622,52 @@ async function main() {
   const uri_1 = await openQuery(jsession2, viewstate1, uid, all, ec_aurl)
   const open_table_1 = await openTable(jsession2, uri_1, ec_aurl)
   const open_date_1 = await openDate(jsession2, uri_1, ...open_table_1[0])
-  const { dom_table_final, viewState5, lwfocus, ecfocus, onHidelink } = await clickOK(jsession2, uri_1, ...open_date_1)
+  const { dom_table_final: dom_loc2, viewState5, lwfocus, ecfocus, onHidelink } = await clickOK(jsession2, uri_1, ...open_date_1)
   const viewstate6 = await onHide(jsession2, uri_1, viewState5, lwfocus, ecfocus, onHidelink)
   await refreshTable(jsession2, uri_1, open_table_1[2], open_table_1[0][2], open_table_1[0][3], open_table_1[0][4], viewstate6)
   const open_date_2 = await openDate(jsession2, uri_1, ...open_table_1[0])
-  const x = await clickOK(jsession2, uri_1, ...open_date_2)
-  async function delayScriptExecution() {
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    console.log('Script execution delayed by 3 seconds.');
+  const { dom_table_final: dom_ext } = await clickOK(jsession2, uri_1, ...open_date_2)
+  async function delayScriptExecution(time) {
+    await new Promise(resolve => setTimeout(resolve, time * 1000));
+    console.log(`Script execution delayed by ${time / 60} mins`);
   }
 
-  // var test = dom_table_final.window.document.getElementsByClassName('dataTableInner')
-  if (dom_table_final.window.document.getElementsByClassName('dataTableInner')) {
-    if (dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
-      const sample_arr_di = dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-      var data = await proceesArray(sample_arr_di)
-      if (data[0] == "Empty") {
-        console.log("delay 5 minutes")
-        await delayScriptExecution()
-        console.log("retry affter 5 minutes")
-        await main();
-      } else {
-
-        for (const val of data[1]) {
-          if (val.length > 0) {
-            const casted = await castSample(val)
-            const reduced = stringRep(casted)
-            await sendMessage(reduced)
-          }
-        }
-
-        if (x.dom_table_final.window.document.getElementsByClassName('dataTableInner').length > 0) {
-          const sample_arr_ext = x.dom_table_final.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
-          const data1 = await proceesArray(sample_arr_ext)
-          for (const val of data1[1]) {
-            if (val.length > 0) {
-              const casted = await castSample(val)
-              const reduced = stringRep(casted)
-              await sendMessage(reduced)
-            }
-          }
-        } else {
-          console.log("LOC I & LOC III No data yet")
-          await sendMessage("LOC I & LOC III No data yet")
-        }
-      }
+  // var test = dom_table_final.window.document.getElementsByClassName('dataTableInner') {
+  if (dom_loc2.window.document.getElementsByClassName('dataTableInner').length > 0) {
+    const sample_arr_loc2 = dom_loc2.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
+    var data_loc2 = await proceesArray(sample_arr_loc2)
+    if (data_loc2[0] == "Empty") {
+      console.log("delay 5 minutes")
+      await delayScriptExecution(300)
+      console.log("retry affter 5 minutes")
+      await main();
     } else {
-      console.log("LOC II No data yet")
-      await sendMessage("LOC II No data yet")
+      const casted_loc2 = await castSample(data_loc2[1])
+      const final_result_loc2 = stringRep(casted_loc2)
+      console.log(final_result_loc2)
+      // await sendMessage(final_result_loc2)
+      if (dom_ext.window.document.getElementsByClassName('dataTableInner').length > 0) {
+        const sample_arr_ext = dom_ext.window.document.getElementsByClassName('dataTableInner')[0].children[1].children
+        const data_ext = await proceesArray(sample_arr_ext)
+        if (data_ext[0] != "Empty") {
+          const casted_ext = await castSample(data_ext[1])
+          const final_result_ext = stringRep(casted_ext)
+          console.log(final_result_ext)
+          // await sendMessage(reduced)
+        }
+
+      }
     }
   } else {
-    console.log("table not available")
+    console.log("No data yet")
+    await delayScriptExecution(900)
+    console.log("Retrying after wait")
+    await main();
+    // await sendMessage("LOC II No data yet")
   }
   const endTime = performance.now();
   const executionTime = endTime - startTime;
   const formattedTime = (executionTime / 1000).toFixed(2) + " Seconds";
-  await sendMessage(formattedTime)
+  //await sendMessage(formattedTime)
 }
 main();
