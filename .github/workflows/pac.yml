@@ -1,6 +1,7 @@
 name: build exe
 on:
   workflow_dispatch:
+
 jobs:
   pack:
     name: bundling & packing
@@ -20,61 +21,59 @@ jobs:
         id: previoustag
         uses: 'WyriHaximus/github-action-get-previous-tag@v1'
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
-         fallback: 1.0.0
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fallback: 1.0.0
+      - name: 'Check if Tag Exists'
+        id: check_tag_exists
+        run: |
+          TAG_EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.previoustag.outputs.tag }}" \
+          | jq -r '.message')
+          if [[ "$TAG_EXISTS" == "Not Found" ]]; then
+            echo "Tag doesn't exist. Proceeding with release."
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "Tag already exists. Creating a new version."
+            NEW_TAG="v$(($(echo ${{ steps.previoustag.outputs.tag }} | sed 's/v//') + 1))"
+            echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          fi
       - name: 'Get next version'
         id: monoversion
         uses: "WyriHaximus/github-action-next-release-version@1.0.0"
         with:
-         version: ${{ steps.previoustag.outputs.tag }}
+          version: ${{ steps.previoustag.outputs.tag }}
       - name: 'Release'
+        if: env.TAG_EXISTS == 'false'
         uses: actions/create-release@v1
         id: create_release
         env:
-         GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-         draft: false
-         prerelease: false
-         tag_name: ${{ steps.monoversion.outputs.version }}
-         release_name: Release ${{ steps.monoversion.outputs.version}}
+          draft: false
+          prerelease: false
+          tag_name: ${{ steps.previoustag.outputs.tag }}
+          release_name: Release ${{ steps.previoustag.outputs.tag }}
+      - name: 'Release (with new tag)'
+        if: env.TAG_EXISTS == 'true'
+        uses: actions/create-release@v1
+        id: create_release_new_tag
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          draft: false
+          prerelease: false
+          tag_name: ${{ env.NEW_TAG }}
+          release_name: Release ${{ env.NEW_TAG }}
+      - name: 'Rename the output file'
+        run: mv ./index.exe ./something.exe
       - name: 'Upload Release'
         uses: actions/upload-release-asset@v1
         env:
-         GITHUB_TOKEN: ${{ github.token }}
+            GITHUB_TOKEN: ${{ github.token }}
         with:
-         upload_url: ${{ steps.create_release.outputs.upload_url }}
-         asset_path: ./index.exe
-         asset_name: index.exe
-         asset_content_type: application/exe
-#       - name: Upload server release
-#         uses: svenstaro/upload-release-action@v2
-#         with:
-#           repo_token: ${{ secrets.GITHUB_TOKEN }}
-#           file: '**/*.exe'
-#           file_glob: true
-#           tag: ${{ github.ref }}
-#           overwrite: true
-#       - uses: actions/upload-artifact@v2
-#         with:
-#           name: distributables
-#           path: dist/*
-#           if-no-files-found: error
-#       - uses: actions/upload-artifact@v2
-#         with:
-#           name: executeable
-#           path: '**/*.exe'
-#           if-no-files-found: error
-#   publish:
-#     name: Publish a release
-#     runs-on: "ubuntu-18.04"
-#     needs:
-#       - pack
-#     steps:
-#       - name: Get our distributables
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: executeable
-#           path: exe
-
-      
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./something.exe
+            asset_name: something.exe
+            asset_content_type: application/exe
