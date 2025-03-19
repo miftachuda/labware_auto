@@ -27,24 +27,24 @@ jobs:
       - name: 'Check if Tag Exists'
         id: check_tag_exists
         run: |
-        TAG_EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-        "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.previoustag.outputs.tag }}" \
+          TAG_EXISTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.previoustag.outputs.tag }}" \
           | jq -r '.message')
           if [[ "$TAG_EXISTS" == "Not Found" ]]; then
             echo "Tag doesn't exist. Proceeding with release."
-          echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
           else
-          echo "Tag already exists. Creating a new version."
-          # Extract the major, minor, and patch numbers, and increment the patch version
-          VERSION=${{ steps.previoustag.outputs.tag }}
-          MAJOR=$(echo $VERSION | cut -d. -f1)
-          MINOR=$(echo $VERSION | cut -d. -f2)
-          PATCH=$(echo $VERSION | cut -d. -f3)
-          NEW_PATCH=$((PATCH + 1))
-          NEW_TAG="${MAJOR}.${MINOR}.${NEW_PATCH}"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-          echo "TAG_EXISTS=true" >> $GITHUB_ENV
-        fi
+            echo "Tag already exists. Creating a new version."
+            # Extract the major, minor, and patch numbers, and increment the patch version
+            VERSION=${{ steps.previoustag.outputs.tag }}
+            MAJOR=$(echo $VERSION | cut -d. -f1)
+            MINOR=$(echo $VERSION | cut -d. -f2)
+            PATCH=$(echo $VERSION | cut -d. -f3)
+            NEW_PATCH=$((PATCH + 1))
+            NEW_TAG="${MAJOR}.${MINOR}.${NEW_PATCH}"
+            echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          fi
       - name: 'Get next version'
         id: monoversion
         uses: "WyriHaximus/github-action-next-release-version@1.0.0"
