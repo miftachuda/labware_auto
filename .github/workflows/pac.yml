@@ -33,6 +33,7 @@ jobs:
           if [[ "$TAG_EXISTS" == "Not Found" ]]; then
             echo "Tag doesn't exist. Proceeding with release."
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "NEW_TAG=${{ steps.previoustag.outputs.tag }}" >> $GITHUB_ENV
           else
             echo "Tag already exists. Creating a new version."
             # Extract the major, minor, and patch numbers, and increment the patch version
@@ -45,11 +46,6 @@ jobs:
             echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           fi
-      - name: 'Get next version'
-        id: monoversion
-        uses: "WyriHaximus/github-action-next-release-version@1.0.0"
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
       - name: 'Release'
         if: env.TAG_EXISTS == 'false'
         uses: actions/create-release@v1
@@ -59,8 +55,8 @@ jobs:
         with:
           draft: false
           prerelease: false
-          tag_name: ${{ steps.previoustag.outputs.tag }}
-          release_name: Release ${{ steps.previoustag.outputs.tag }}
+          tag_name: ${{ env.NEW_TAG }}
+          release_name: Release ${{ env.NEW_TAG }}
       - name: 'Release (with new tag)'
         if: env.TAG_EXISTS == 'true'
         uses: actions/create-release@v1
