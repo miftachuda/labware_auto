@@ -75,11 +75,22 @@ jobs:
       - name: 'Rename the output file'
         run: mv ./index.exe ./something.exe
       - name: 'Upload Release'
+        if: env.TAG_EXISTS == 'false'
         uses: actions/upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ github.token }}
         with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./something.exe
+            asset_name: something.exe
+            asset_content_type: application/exe
+      - name: 'Upload Release (with new tag)'
+        if: env.TAG_EXISTS == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+            GITHUB_TOKEN: ${{ github.token }}
+        with:
+            upload_url: ${{ steps.create_release_new_tag.outputs.upload_url }}
             asset_path: ./something.exe
             asset_name: something.exe
             asset_content_type: application/exe
