@@ -42,38 +42,4 @@ jobs:
       - name: 'Get latest tag'
         id: get_tag
         run: |
-          VERSION=$(git tag -l | sort -V | tail -n 1)
-          echo "Latest version tag: $VERSION"
-          echo "::set-output name=version::$VERSION"
-
-      # Increment the minor version of the latest tag
-      - name: 'Increment minor version'
-        id: increment_version
-        run: |
-          VERSION="${{ steps.get_tag.outputs.version }}"
-          if [ -z "$VERSION" ]; then
-            VERSION="v0.1.0"
-          fi
-          VERSION_PARTS=(${VERSION//./ })
-          NEW_MINOR=$((VERSION_PARTS[1] + 1))
-          NEW_VERSION="${VERSION_PARTS[0]}.${NEW_MINOR}.0"
-          echo "New version: $NEW_VERSION"
-          echo "::set-output name=new_version::$NEW_VERSION"
-
-      # Create a new Git tag with the incremented version
-      - name: 'Create new tag'
-        run: |
-          NEW_VERSION="${{ steps.increment_version.outputs.new_version }}"
-          git tag "$NEW_VERSION"
-          git push origin "$NEW_VERSION"
-
-      # Create a GitHub release with the new tag
-      - name: 'Create GitHub Release'
-        uses: ghactions/create-release@v1
-        with:
-          tag_name: ${{ steps.increment_version.outputs.new_version }}
-          release_name: Release ${{ steps.increment_version.outputs.new_version }}
-          body: 'This is a new release created automatically by GitHub Actions.'
-          draft: false
-          prerelease: false
-
+          VERSION=$(git tag -l | sort -V | tail -n 1
