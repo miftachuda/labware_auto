@@ -1,8 +1,9 @@
-const axiost = require("axios");
 const { JSDOM } = require("jsdom");
 const { XMLParser } = require("fast-xml-parser");
-var qs = require("qs");
 const moment = require("moment/moment");
+const fetch = require("node-fetch");
+
+const fs = require("fs");
 
 async function One() {
   var config = {
@@ -570,40 +571,7 @@ async function castSample(sam) {
   }, "");
   return `<b>Shift : ${shift}</b> \n${final_sample}`;
 }
-async function sendMessage(message) {
-  console.log(message);
-  const pro_agent = require('proxying-agent').globalize('http://miftachul.huda:pertamina%402029@172.17.3.161:8080');
-  async function callAxiosWithRetry(config, depth, failMassage) {
-    const wait = (ms) => new Promise((res) => setTimeout(res, ms));
-    try {
-      return await axiost(config);
-    } catch (e) {
-      if (depth > 10) {
-        throw e;
-      }
-      console.log(e);
-      await wait(2 ** depth * 100);
-      console.log("Retrying .. " + depth);
-      return callAxiosWithRetry(config, depth + 1, failMassage);
-    }
-  }
-  let encoded = encodeURIComponent(message);
-  var config = {
-    httpAgent: pro_agent,
-    httpsAgent: pro_agent,
-    method: "post",
-    url: `https://api.telegram.org/bot5266529032:AAG6oq2TOmKOXrt5qaeVLk3ehvYF0bJZ6ko/sendMessage?chat_id=-805440157&parse_mode=HTML&text=${encoded}`,
-    headers: {},
-  };
 
-  await callAxiosWithRetry(config, 0, "Fail Send Telegram")
-    .then(function (response) {
-      console.log("Telegram message Sent");
-    })
-    .catch(function (error) {
-      console.log("Failed sending Telegram message");
-    });
-}
 function stringRep(text) {
   var mapObj = {
     "Kinematic Viscosity at 40°C": "Visco 40°C",
@@ -715,39 +683,34 @@ async function main() {
     uri_1,
     ...open_date_2
   );
-//   async function delayScriptExecution(time) {
-//     await new Promise((resolve) => setTimeout(resolve, time * 1000));
-//     console.log(`Script execution delayed by ${time / 60} mins`);
-//   }
+  const sample_arr_loc2 =
+    dom_loc2.window.document.getElementsByClassName("dataTableInner")[0]
+      .children[1].children;
+  var data_loc2 = await proceesArray(sample_arr_loc2);
+  const result = {};
+  const keys = ["malam", "pagi", "sore"];
+  keys.forEach((key, index) => {
+    result[key] = data_loc2[1][index] || []; // Use empty array if data is missing
+  });
+  var text = JSON.stringify(result);
+  const casted_loc2 = await castSample(data_loc2[1][0]);
 
-
-
-
-    const sample_arr_loc2 =
-      dom_loc2.window.document.getElementsByClassName("dataTableInner")[0]
-        .children[1].children;
-    var data_loc2 = await proceesArray(sample_arr_loc2);
-    if (data_loc2[0] == "Empty") {
-
-    } else {
-      const casted_loc2 = await castSample(data_loc2[1][0]);
-      const final_result_loc2 = stringRep(casted_loc2);
-      console.log(final_result_loc2);
-    //   if (
-    //     dom_ext.window.document.getElementsByClassName("dataTableInner")
-    //       .length > 0
-    //   ) {
-    //     const sample_arr_ext =
-    //       dom_ext.window.document.getElementsByClassName("dataTableInner")[0]
-    //         .children[1].children;
-    //     const data_ext = await proceesArray(sample_arr_ext);
-    //     if (data_ext[0] != "Empty") {
-    //       const casted_ext = await castSample(data_ext[1]);
-    //       const final_result_ext = stringRep(casted_ext);
-    //       console.log(final_result_ext);
-    //       // await sendMessage(reduced)
-    //     }
-    //   }
-    }
+  const final_result_loc2 = stringRep(casted_loc2);
+  console.log(final_result_loc2);
+  //   if (
+  //     dom_ext.window.document.getElementsByClassName("dataTableInner")
+  //       .length > 0
+  //   ) {
+  //     const sample_arr_ext =
+  //       dom_ext.window.document.getElementsByClassName("dataTableInner")[0]
+  //         .children[1].children;
+  //     const data_ext = await proceesArray(sample_arr_ext);
+  //     if (data_ext[0] != "Empty") {
+  //       const casted_ext = await castSample(data_ext[1]);
+  //       const final_result_ext = stringRep(casted_ext);
+  //       console.log(final_result_ext);
+  //       // await sendMessage(reduced)
+  //     }
+  //   }
 }
 main();
