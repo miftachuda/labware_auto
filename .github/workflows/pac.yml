@@ -22,7 +22,7 @@ jobs:
 
       # Bundle the project with esbuild
       - name: 'Bundling with esbuild'
-        run: npx esbuild index.js --bundle --platform=node --external:./xhr-sync-worker.js --external:canvas --outfile=dist/index.js
+        run: npx esbuild index.js --bundle --platform=node --external:canvas --outfile=dist/index.js
 
       # Package the app with pkg
       - name: 'Packaging with pkg'
