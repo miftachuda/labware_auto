@@ -730,7 +730,7 @@ async function main() {
     if (data_loc2[0] == "Empty") {
 
     } else {
-      const casted_loc2 = await castSample(data_loc2[1]);
+      const casted_loc2 = await castSample(data_loc2[1][0]);
       const final_result_loc2 = stringRep(casted_loc2);
       console.log(final_result_loc2);
     //   if (
