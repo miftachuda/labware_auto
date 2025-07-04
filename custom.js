@@ -2,7 +2,7 @@ const { JSDOM } = require("jsdom");
 const { XMLParser } = require("fast-xml-parser");
 const moment = require("moment/moment");
 const fetch = require("node-fetch");
-
+const http = require("http");
 const fs = require("fs");
 
 async function One() {
@@ -646,7 +646,78 @@ async function proceesArray(array_in) {
   //   return ["All", sorted];
   // }
 }
-async function main() {
+
+function parseToCSV(input) {
+  const rows = input
+    .replace(/<b>/g, "**")
+    .replace(/<\/b>/g, "**")
+    .split(/[\r\n]+/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const data = {};
+  let currentSample = null;
+
+  for (const line of rows) {
+    const sampleMatch = /^\*\*(.+?)\s*:\*\*$/.exec(line);
+    if (sampleMatch) {
+      currentSample = sampleMatch[1].trim();
+      if (!data[currentSample]) {
+        data[currentSample] = { properties: [], values: [] };
+      }
+    } else if (currentSample && line.includes(":")) {
+      const [prop, val] = line.split(":").map((s) => s.trim());
+      data[currentSample].properties.push(prop);
+      data[currentSample].values.push(val);
+    }
+  }
+
+  // Convert to CSV with ; separator and merged rows
+  let csv = "SampleID;Property;Value\n";
+  for (const sampleID in data) {
+    const props = data[sampleID].properties.join("#").replace(/"/g, '""');
+    const vals = data[sampleID].values.join("#").replace(/"/g, '""');
+    csv += `"${sampleID}";"${props}";"${vals}"\n`;
+  }
+
+  return csv;
+}
+
+function parseDataToCSV(raw) {
+  const lines = raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const csvRows = [["SampleID", "Property", "Value", "Unit"]];
+  let currentSampleID = "";
+
+  const sampleRegex = /^<b>([\w\d]+)\s*:<\/b>$/;
+  const dataRegex = /^(.*?):\s*(.+)$/;
+
+  for (const line of lines) {
+    const sampleMatch = sampleRegex.exec(line);
+    if (sampleMatch) {
+      currentSampleID = sampleMatch[1];
+      continue;
+    }
+
+    const dataMatch = dataRegex.exec(line);
+    if (dataMatch && currentSampleID) {
+      const property = dataMatch[1].trim();
+      const valueUnit = dataMatch[2].trim();
+
+      const parts = valueUnit.split(/\s+/);
+      const value = parts[0];
+      const unit = parts.length > 1 ? parts.slice(1).join(" ") : "";
+
+      csvRows.push(["'" + currentSampleID, property, value, unit]);
+    }
+  }
+
+  return csvRows.map((row) => row.join(";")).join("\n");
+}
+
+async function getData() {
   const jsession1 = await One();
   const jsession2 = await LoginForm(jsession1);
   const { viewstate1, uid, all, ec_aurl } = await mainPage(jsession2);
@@ -712,5 +783,30 @@ async function main() {
   //       // await sendMessage(reduced)
   //     }
   //   }
+  return final_result_loc2;
+}
+
+function startServer() {
+  http
+    .createServer(async (req, res) => {
+      if (req.url === "/data") {
+        var result = await getData();
+        const csvContent = parseToCSV(result);
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", "attachment; filename=data.csv");
+        res.write("\uFEFF" + csvContent);
+        res.end();
+      } else {
+        res.writeHead(404);
+        res.end("Not Found");
+      }
+    })
+    .listen(8080, () => {
+      console.log("Server running at http://localhost:8080/data");
+    });
+}
+
+async function main() {
+  startServer();
 }
 main();
