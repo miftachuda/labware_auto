@@ -648,6 +648,29 @@ async function proceesArray(array_in) {
 }
 
 function parseToCSV(input) {
+  const sampleNameMap = {
+    "02101": "Long Residue",
+    "02102": "VGO",
+    "02103": "SPO",
+    "02104": "LMO",
+    "02105": "MMO",
+    "02107": "Short Res",
+    "02201": "Short Res",
+    "02202": "DAO",
+    "02203": "Asphalt",
+    "02301": "Distillate",
+    "02302": "Raffinate",
+    "023C108": "Raffinate C108",
+    "02303": "Extract",
+    "02304": "Feed 023C-106",
+    "02310": "Water to Drain",
+    "02401": "HDT",
+    "02405": "DOR",
+    "02406": "SLack Wax",
+    "02409": "Water to Drain",
+    "02410": "DORT",
+  };
+
   const rows = input
     .replace(/<b>/g, "**")
     .replace(/<\/b>/g, "**")
@@ -673,11 +696,12 @@ function parseToCSV(input) {
   }
 
   // Convert to CSV with ; separator and merged rows
-  let csv = "SampleID;Property;Value\n";
+  let csv = "SampleID;SampleName;Property;Value\n";
   for (const sampleID in data) {
     const props = data[sampleID].properties.join("#").replace(/"/g, '""');
     const vals = data[sampleID].values.join("#").replace(/"/g, '""');
-    csv += `"${sampleID}";"${props}";"${vals}"\n`;
+    const sampleName = sampleNameMap[sampleID] || "";
+    csv += `"${sampleID}";"${sampleName}";"${props}";"${vals}"\n`;
   }
 
   return csv;
@@ -764,10 +788,14 @@ async function getData() {
     result[key] = data_loc2[1][index] || []; // Use empty array if data is missing
   });
   var text = JSON.stringify(result);
-  const casted_loc2 = await castSample(data_loc2[1][0]);
+  const casted_loc2_malam = await castSample(data_loc2[1][0]);
+  const casted_loc2_pagi = await castSample(data_loc2[1][1]);
+  const casted_loc2_sore = await castSample(data_loc2[1][2]);
 
-  const final_result_loc2 = stringRep(casted_loc2);
-  console.log(final_result_loc2);
+  const final_result_loc2_m = stringRep(casted_loc2_malam);
+  const final_result_loc2_p = stringRep(casted_loc2_pagi);
+  const final_result_loc2_s = stringRep(casted_loc2_sore);
+
   //   if (
   //     dom_ext.window.document.getElementsByClassName("dataTableInner")
   //       .length > 0
@@ -783,15 +811,53 @@ async function getData() {
   //       // await sendMessage(reduced)
   //     }
   //   }
-  return final_result_loc2;
+  return [final_result_loc2_m, final_result_loc2_p, final_result_loc2_s];
+}
+let cache = null;
+let cacheTime = 0;
+
+const queue = [];
+let running = false;
+
+async function runQueue() {
+  if (running || queue.length === 0) return;
+  running = true;
+  const { resolve, reject } = queue.shift();
+  try {
+    // Refresh cache if older than 1 minute
+    if (!cache || Date.now() - cacheTime > 60_000) {
+      cache = await getData();
+      cacheTime = Date.now();
+    }
+    resolve(cache);
+  } catch (err) {
+    reject(err);
+  } finally {
+    running = false;
+    runQueue();
+  }
+}
+
+function getDataQueued() {
+  return new Promise((resolve, reject) => {
+    queue.push({ resolve, reject });
+    runQueue();
+  });
 }
 
 function startServer() {
+  const pathToIndex = {
+    "/data_m": 0,
+    "/data_p": 1,
+    "/data_s": 2,
+  };
+
   http
     .createServer(async (req, res) => {
-      if (req.url === "/data") {
-        var result = await getData();
-        const csvContent = parseToCSV(result);
+      if (pathToIndex.hasOwnProperty(req.url)) {
+        const result = await getDataQueued();
+        const index = pathToIndex[req.url];
+        const csvContent = parseToCSV(result[index]);
         res.setHeader("Content-Type", "text/csv; charset=utf-8");
         res.setHeader("Content-Disposition", "attachment; filename=data.csv");
         res.write("\uFEFF" + csvContent);
@@ -801,8 +867,8 @@ function startServer() {
         res.end("Not Found");
       }
     })
-    .listen(8080, () => {
-      console.log("Server running at http://localhost:8080/data");
+    .listen(53235, () => {
+      console.log("Server running");
     });
 }
 

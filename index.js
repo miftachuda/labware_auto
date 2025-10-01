@@ -1,7 +1,7 @@
-const axiost = require("axios");
+//const axiost = require("axios");
 const { JSDOM } = require("jsdom");
 const { XMLParser } = require("fast-xml-parser");
-var qs = require("qs");
+//var qs = require("qs");
 const moment = require("moment/moment");
 
 async function One() {
@@ -572,7 +572,9 @@ async function castSample(sam) {
 }
 async function sendMessage(message) {
   console.log(message);
-  const pro_agent = require('proxying-agent').globalize('http://miftachul.huda:pertamina%402029@172.17.3.161:8080');
+  const pro_agent = require("proxying-agent").globalize(
+    "http://miftachul.huda:pertamina%402029@172.17.3.161:8080"
+  );
   async function callAxiosWithRetry(config, depth, failMassage) {
     const wait = (ms) => new Promise((res) => setTimeout(res, ms));
     try {
