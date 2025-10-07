@@ -1,0 +1,87 @@
+name: build exe 2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pack:
+    name: bundling & packing
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v2
+
+      # Set up Node.js environment
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.18.0
+
+      # Install dependencies
+      - name: "Install Dependencies"
+        run: npm install
+
+      # Bundle the project with esbuild
+      # Package the app with pkg
+      - name: "Packaging with pkg"
+        run: npx pkg --compress GZip -t node18-win-x64 custom.js --output labware.exe
+
+      # Set up Git user
+      - name: "Set up Git user"
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      # Fetch tags to find the latest version
+      - name: "Fetch tags"
+        run: git fetch --tags
+
+      # Get the latest tag
+      - name: "Get latest tag"
+        id: get_tag
+        run: |
+          VERSION=$(git tag -l | sort -V | tail -n 1)
+          echo "Latest version tag: $VERSION"
+          echo "::set-output name=version::$VERSION"
+
+      # Increment the minor version of the latest tag
+      - name: "Increment minor version"
+        id: increment_version
+        run: |
+          VERSION="${{ steps.get_tag.outputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="v0.1.0"
+          fi
+          VERSION_PARTS=(${VERSION//./ })
+          NEW_MINOR=$((VERSION_PARTS[1] + 1))
+          NEW_VERSION="${VERSION_PARTS[0]}.${NEW_MINOR}.0"
+          echo "New version: $NEW_VERSION"
+          echo "::set-output name=new_version::$NEW_VERSION"
+
+      # Create a new Git tag with the incremented version
+      - name: "Create new tag"
+        run: |
+          NEW_VERSION="${{ steps.increment_version.outputs.new_version }}"
+          git tag "$NEW_VERSION"
+          git push origin "$NEW_VERSION"
+
+      # Create a GitHub Release with the new tag using softprops/action-gh-release
+      - name: "Create GitHub Release"
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.increment_version.outputs.new_version }}
+          release_name: Release ${{ steps.increment_version.outputs.new_version }}
+          body: "This is a new release created automatically by GitHub Actions."
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload the index.exe file to the release
+      - name: "Upload labware.exe to release"
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.increment_version.outputs.new_version }}
+          files: "labware.exe"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
