@@ -174,7 +174,9 @@ async function openQuery(jsession, viewstate2, uid, uriid, ec_aurl) {
 
   try {
     const response = await fetch(
-      `https://apps.pertamina.com/LIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${uriid}&ec_ajax=true&ts=${Date.now()}`,
+      `https://apps.pertamina.com/LIMS/index.htm?ec_eid=onclick&ec_cid=mf%3A${
+        uriid[0]
+      }&ec_ajax=true&ts=${Date.now()}`,
       config
     );
     if (!response.ok) {

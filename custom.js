@@ -852,24 +852,36 @@ function startServer() {
     "/data_s": 2,
   };
 
+  let queue = Promise.resolve();
+
+  function queueJob(job) {
+    const next = queue.then(job, job);
+    queue = next.catch(() => {}); // prevent queue breaking on errors
+    return next;
+  }
+
   http
     .createServer(async (req, res) => {
-      if (pathToIndex.hasOwnProperty(req.url)) {
-        const result = await getDataQueued();
+      if (!pathToIndex.hasOwnProperty(req.url)) {
+        res.writeHead(404);
+        return res.end("Not Found");
+      }
+
+      try {
+        const result = await queueJob(() => getDataQueued());
         const index = pathToIndex[req.url];
         const csvContent = parseToCSV(result[index]);
         res.setHeader("Content-Type", "text/csv; charset=utf-8");
         res.setHeader("Content-Disposition", "attachment; filename=data.csv");
         res.write("\uFEFF" + csvContent);
         res.end();
-      } else {
-        res.writeHead(404);
-        res.end("Not Found");
+      } catch (err) {
+        console.error(err);
+        res.writeHead(500);
+        res.end("Internal Server Error");
       }
     })
-    .listen(53235, () => {
-      console.log("Server running");
-    });
+    .listen(53235, () => console.log("Server running"));
 }
 
 async function main() {
